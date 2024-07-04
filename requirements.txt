@@ -1,1 +1,11 @@
 Flask
+sentence_transformers
+llama-index
+sentence_transformers
+transformers
+einops
+accelerate
+langchain
+bitsandbytes
+langchain-community
+huggingface_hub 
