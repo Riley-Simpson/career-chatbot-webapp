@@ -1,6 +1,9 @@
 Flask
+flask-ngrok
 sentence_transformers
 llama-index
+llama-index-llms-huggingface
+huggingface_hub 
 sentence_transformers
 transformers
 einops
@@ -8,4 +11,3 @@ accelerate
 langchain
 bitsandbytes
 langchain-community
-huggingface_hub 
