@@ -16,8 +16,10 @@ class Chat:
     def __init__(self):
         self.dataset = None
         self.llm = None
+        self.service_context = None
+        self.index=None
+        self.query_engine=None
         self.main = None
-
 
     def hg_login(self):
         with open("HUGGING_FACE_TOKEN.json", "r") as f:
@@ -59,24 +61,37 @@ class Chat:
         self.embedded_model=LangchainEmbedding(HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2"))
         return print("Model Embeded")
 
+    def service_context(self):
+        self.service_context=ServiceContext.from_defaults(
+        chunk_size=1024,
+        llm=self.llm,
+        embed_model=self.embed_model)
+        print("Service Context established")
+
+    def engine_start(self):
+        self.index = VectorStoreIndex.from_documents(self.data,service_context=self.service_context)
+        self.query_engine= self.index.as_query_engine()
+        print("Engine Loaded")
 
     def query(self, query_str):
-        return self.llm(query_str)
+        return self.query_engine(query_str)
 
     def main(self):
         self.hg_login()
         self.data_load()
-        #self.load_model()
+        self.load_model()
         self.embed_model()
-        print(self.embed_model)
+        self.service_context()
+        self.engine_start()
 
-chat_instance = Chat()
-chat_instance.main()
+
 
 app = Flask(__name__)
 
 @app.route("/query", methods=["POST"])
 def query():
+    chat_instance = Chat()
+    chat_instance.main()
     data = request.get_json()
     response = chat_instance.query(data["query"])
     return jsonify({"response": response})
