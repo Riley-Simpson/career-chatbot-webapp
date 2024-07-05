@@ -102,8 +102,7 @@ with open("ngrok.json","r") as f:
 
 
 if __name__ == "__main__":
-    # Start ngrok
     ngrok.set_auth_token(ngrok_api_key)
     public_url = ngrok.connect(5000)
-    print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:5000\"")
-    app.run()
+    print(f" * ngrok tunnel \"{public_url}\" -> \"http://0.0.0.0:5000\"")
+    app.run(host="0.0.0.0",port=5000)
