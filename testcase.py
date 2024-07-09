@@ -18,7 +18,7 @@ def send_query_to_ngrok(query_str, ngrok_url):
         return f"Error: {response.status_code}, {response.text}"
 
 # Example usage
-ngrok_url = "https://bc5a-34-32-199-169.ngrok-free.app/"  # Replace with your actual ngrok URL
+ngrok_url = "https://13ef-34-125-199-93.ngrok-free.app/"  # Replace with your actual ngrok URL
 query_str = "What are the job opportunities for computer science graduates?"
 
 response = send_query_to_ngrok(query_str, ngrok_url)

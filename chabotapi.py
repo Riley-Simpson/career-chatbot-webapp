@@ -87,11 +87,11 @@ class Chat:
 
 
 app = Flask(__name__)
+chat_instance = Chat()
+chat_instance.initialize()
 
 @app.route("/query", methods=["POST"])
-def query():
-    chat_instance = Chat()
-    chat_instance.initialize()
+def query():   
     data = request.get_json()
     response = chat_instance.query(data["query"])
     return jsonify({"response": response})
