@@ -19,7 +19,7 @@ class Chat:
         self.service_context = None
         self.index=None
         self.query_engine=None
-        self.main = None
+        
 
     def hg_login(self):
         with open("HUGGING_FACE_TOKEN.json", "r") as f:
@@ -76,7 +76,7 @@ class Chat:
     def query(self, query_str):
         return self.query_engine(query_str)
 
-    def main(self):
+    def initialize(self):
         self.hg_login()
         self.data_load()
         self.load_model()
@@ -91,7 +91,7 @@ app = Flask(__name__)
 @app.route("/query", methods=["POST"])
 def query():
     chat_instance = Chat()
-    chat_instance.main()
+    chat_instance.initialize()
     data = request.get_json()
     response = chat_instance.query(data["query"])
     return jsonify({"response": response})
