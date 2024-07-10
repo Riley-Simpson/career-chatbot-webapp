@@ -30,10 +30,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userMessage) {
             addMessageToChatLog('User', userMessage);
             userInput.value = '';
-            // Simulate bot response
-            setTimeout(() => {
-                addMessageToChatLog('Career Bot', 'This is a response from the bot.');
-            }, 1000);
+
+            fetch("/query", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query: userMessage })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    addMessageToChatLog('Career Bot', data.response.generated_text);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    addMessageToChatLog('Career Bot', 'Sorry, there was an error processing your request.');
+                });
         }
     }
 

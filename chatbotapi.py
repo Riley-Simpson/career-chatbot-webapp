@@ -3,15 +3,15 @@ import requests
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-from flask import Flask, request, jsonify
-from pyngrok import ngrok
+from flask import Flask, request, jsonify, render_template
+from llama_index.core.readers.json import JSONReader
 
 class Chat:
     def __init__(self):
         self.api_url = "https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-hf"
         self.api_key = None
+        self.dataset = None
         self.embeddings = None
-        self.data = None
         self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
     def hg_login(self):
@@ -20,22 +20,28 @@ class Chat:
         print("Successfully Logged in.")
     
     def data_load(self):
-        with open("resume_data.json", "r") as f:
-            self.data = json.load(f)
-        documents = [self._create_document_text(doc) for doc in self.data]
-        self.embeddings = self.model.encode(documents)
-        print("Data and Embeddings Loaded")
+        reader = JSONReader(
+            levels_back=0,
+            collapse_length=200,
+            ensure_ascii=False,
+            is_jsonl=False,
+            clean_json=True,
+        )
+        self.dataset = reader.load_data(input_file="resume_data.json", extra_info={})
+        print("Dataset Loaded")
 
     def _create_document_text(self, doc):
-        experiences = " ".join(doc.get("experience", []) or [])  # Handle the case when 'experience' is missing
-        skills = " ".join(doc.get("skills", []) or [])  # Handle the case when 'skills' is missing
+        experiences = " ".join(doc.get("experience", []) or [])
+        skills = " ".join(doc.get("skills", []) or [])
         return f"Experience: {experiences} Skills: {skills}"
 
     def retrieve_documents(self, query_str, top_k=3):
+        documents = [self._create_document_text(doc) for doc in self.dataset]
+        self.embeddings = self.model.encode(documents)
         query_embedding = self.model.encode([query_str])
         similarities = cosine_similarity(query_embedding, self.embeddings)
         top_k_indices = np.argsort(similarities[0])[-top_k:][::-1]
-        retrieved_docs = [self.data[idx] for idx in top_k_indices]
+        retrieved_docs = [self.dataset[idx] for idx in top_k_indices]
         return retrieved_docs
 
     def generate_response(self, context):
@@ -54,25 +60,19 @@ class Chat:
         self.hg_login()
         self.data_load()
 
-
 app = Flask(__name__)
 chat_instance = Chat()
 chat_instance.initialize()
 
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 @app.route("/query", methods=["POST"])
-def query():   
+def query():
     data = request.get_json()
     response = chat_instance.query(data["query"])
     return jsonify({"response": response})
 
-
-with open("ngrok.json","r") as f:
-    ngrok_api_key = json.load(f)["authtoken"]
-
-
 if __name__ == "__main__":
-    ngrok.set_auth_token(ngrok_api_key)
-    public_url = ngrok.connect(5000)
-    print(f" * ngrok tunnel \"{public_url}\" -> \"http://0.0.0.0:5000\"")
-    app.run(host="0.0.0.0",port=5000)
-
+    app.run(host="0.0.0.0", port=5000)
