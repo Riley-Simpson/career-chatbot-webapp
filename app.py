@@ -20,6 +20,9 @@ class Chat:
         print("Successfully Logged in.")
     
     def data_load(self):
+        url = 'https://github.com/Riley-Simpson/career-chatbot-webapp/blob/main/resume_data.json'
+        response = requests.get(url)
+        data = response.json()
         reader = JSONReader(
             levels_back=0,
             collapse_length=200,
@@ -27,7 +30,7 @@ class Chat:
             is_jsonl=False,
             clean_json=True,
         )
-        self.dataset = reader.load_data(input_file="resume_data.json", extra_info={})
+        self.dataset = reader.load_data(input_file=data, extra_info={})
         print("Dataset Loaded")
 
     def _create_document_text(self, doc):
