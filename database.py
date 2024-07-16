@@ -7,8 +7,8 @@ from sentence_transformers import SentenceTransformer
 import chromadb
 from flask_cors import CORS
 
-database = Flask(__name__)
-CORS(database)
+app = Flask(__name__)
+CORS(app)
 
 # Initialize the SentenceTransformer model
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
@@ -16,6 +16,9 @@ model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 # Initialize Chroma DB
 client = chromadb.Client()
 collection = client.create_collection('resume_data')
+
+# Predefined directory path in the Colab environment
+PREDEFINED_DIRECTORY_PATH = "/content/drive/MyDrive/Dissertation_Database"
 
 def load_data(directory_path):
     try:
@@ -48,13 +51,11 @@ def load_data(directory_path):
     except Exception as e:
         return {"error": f"Error loading data: {e}"}, 500
 
-@database.route("/load_data", methods=["POST"])
+@app.route("/load_data", methods=["POST"])
 def load_data_endpoint():
-    data = request.get_json()
-    directory_path = data.get("directory_path")
-    return jsonify(*load_data(directory_path))
+    return jsonify(*load_data(PREDEFINED_DIRECTORY_PATH))
 
-@database.route("/retrieve_documents", methods=["POST"])
+@app.route("/retrieve_documents", methods=["POST"])
 def retrieve_documents():
     data = request.get_json()
     query_str = data["query_str"]
@@ -71,4 +72,4 @@ def retrieve_documents():
         return jsonify({"error": f"Error retrieving documents: {e}"}), 500
 
 if __name__ == "__main__":
-    database.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5001)
