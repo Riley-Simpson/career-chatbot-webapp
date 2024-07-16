@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessageToChatLog('User', userMessage);
             userInput.value = '';
 
-            fetch("/query", {
+            fetch("http://127.0.0.1:5000/query", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

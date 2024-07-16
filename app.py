@@ -5,6 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from flask import Flask, request, jsonify, render_template
 from llama_index.core.readers.json import JSONReader
+from flask_cors import CORS
 
 class Chat:
     def __init__(self):
@@ -20,9 +21,6 @@ class Chat:
         print("Successfully Logged in.")
     
     def data_load(self):
-        url = 'https://github.com/Riley-Simpson/career-chatbot-webapp/blob/main/resume_data.json'
-        response = requests.get(url)
-        data = response.json()
         reader = JSONReader(
             levels_back=0,
             collapse_length=200,
@@ -30,12 +28,12 @@ class Chat:
             is_jsonl=False,
             clean_json=True,
         )
-        self.dataset = reader.load_data(input_file=data, extra_info={})
+        self.dataset = reader.load_data(input_file="resume_data.json", extra_info={})
         print("Dataset Loaded")
 
     def _create_document_text(self, doc):
-        experiences = " ".join(doc.get("experience", []) or [])
-        skills = " ".join(doc.get("skills", []) or [])
+        experiences = " ".join(doc.experience or [])
+        skills = " ".join(doc.skills or [])
         return f"Experience: {experiences} Skills: {skills}"
 
     def retrieve_documents(self, query_str, top_k=3):
@@ -62,8 +60,9 @@ class Chat:
     def initialize(self):
         self.hg_login()
         self.data_load()
-
+        
 app = Flask(__name__)
+CORS(app) 
 chat_instance = Chat()
 chat_instance.initialize()
 
