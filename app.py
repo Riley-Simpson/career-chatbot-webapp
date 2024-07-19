@@ -8,7 +8,7 @@ class Chat:
     def __init__(self):
         self.api_url = "https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-hf"
         self.api_key = None
-        self.dataset_url = "http://localhost:5001"
+        self.dataset_url = "https://2c57-34-138-57-160.ngrok-free.app"
         self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
     def hg_login(self):
