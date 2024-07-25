@@ -5,3 +5,5 @@ numpy
 Flask
 llama-index
 flask_cors
+chromadb
+tqdm

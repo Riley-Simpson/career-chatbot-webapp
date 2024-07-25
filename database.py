@@ -28,7 +28,7 @@ class Dataset:
             self.client.delete_collection(self.collection_name)
             self.collection = self.client.create_collection(self.collection_name, metadata={"hnws:space":"cosine"})
 
-            doc_embedding=[]
+            doc_embeddings=[]
             metadatas=[]
             ids=[]
                         
@@ -53,11 +53,12 @@ class Dataset:
                     print(f"--------------Embedding {file}--------------")
                     for idx, doc in enumerate(documents):
                         doc_text = doc.get_text()
-                        doc_embedding = self.model.encode([doc_text])
+                        doc_embedding = self.model.encode([doc_text])[0].tolist()
+                        doc_embeddings.append(doc_embedding)
                         metadatas.append({"doc": doc_text})
                         ids.append(str(idx))
-
-            self.collection.add(embeddings=doc_embedding, metadatas=metadatas, ids=ids)
+            
+            self.collection.add(embeddings=doc_embeddings, metadatas=metadatas, ids=ids)
             
             return {"message": "Dataset Loaded"}, 200
         except Exception as e:
@@ -65,24 +66,20 @@ class Dataset:
 
     def retrieve_documents(self, query_str):
         try:
-            query_embedding = self.model.encode([query_str])
+            query_embedding = self.model.encode([query_str])[0].tolist()  # Convert ndarray to list
             similarities = self.collection.query(query_embeddings=query_embedding,
                                                  n_results=3)
             retrieved_docs = []                      
-            if 'metadatas' in similarities:
-                metadatas = similarities['metadatas']
-                print("Metadatas:", metadatas)
-                
-                for metadata in metadatas:
-                    # Debugging: Print each metadata to inspect its structure
-                    print("Metadata:", metadata)
-                    
-                    # Check if metadata is a dictionary and contains the 'doc' key
-                    if isinstance(metadata, dict) and 'doc' in metadata:
-                        document = metadata['doc']
-                        retrieved_docs.append(document)
-                    else:
-                        print("Metadata format is not as expected:", metadata)
+            
+            metadatas = similarities['metadatas']
+           
+            for metadata in metadatas: 
+                # Check if metadata is a dictionary and contains the 'doc' key
+                if isinstance(metadata, dict) and 'doc' in metadata:
+                    document = metadata['doc']
+                    retrieved_docs.append(document)
+                else:
+                    print("Metadata format is not as expected:", metadata)
 
             return retrieved_docs
         except Exception as e:
@@ -94,10 +91,10 @@ if __name__ == "__main__":
 
     # Load data into the collection
     load_response = doc_retrieval.load_data()
-    print(load_response)
+    #print(load_response)
 
     # Retrieve documents based on a query
-    query = "example query"
+    query = "Engineering"
     retrieve_response = doc_retrieval.retrieve_documents(query)
     print(retrieve_response)
 
