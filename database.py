@@ -1,22 +1,36 @@
 import os
-import json
-from llama_index.core.readers.json import JSONReader
+import ujson
 from llama_index.core import SimpleDirectoryReader
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 import chromadb
 
+
 class Dataset:
     def __init__(self, model_name='sentence-transformers/all-MiniLM-L6-v2', collection_name='career_data', predefined_directory_path=None):
-        # Initialize the SentenceTransformer model
         self.model = SentenceTransformer(model_name)
-        # Initialize Chroma DB
         self.client = chromadb.Client()
         self.collection_name = collection_name
         self.collection = self.client.create_collection(collection_name,metadata={"hnws:space":"cosine"})
-        # Predefined directory path in the Colab environment
         self.predefined_directory_path = predefined_directory_path
 
+
+    def process_json(self,file):       
+        with open(file, 'r') as f:
+            json_file = ujson.load(f)
+        
+        print(f"Adding {file}")
+        for idx,doc in enumerate(json_file):
+            try:
+                self.collection.add(
+                    embeddings=self.model.encode(str(doc), batch_size=128).tolist(),
+                    metadatas={key: ', '.join(value) if isinstance(value, list) else value for key, value in doc.items() if value not in [None, '', []]},
+                    ids=f"{file}_{idx}",
+                    documents=str(doc))
+                
+            except Exception as e:
+                print(e)
+               
     def load_data(self, directory_path=None):
         if directory_path is None:
             directory_path = self.predefined_directory_path
@@ -27,64 +41,65 @@ class Dataset:
             # Clear existing collection
             self.client.delete_collection(self.collection_name)
             self.collection = self.client.create_collection(self.collection_name, metadata={"hnws:space":"cosine"})
-
-            doc_embeddings=[]
-            metadatas=[]
-            ids=[]
                         
             # Load and process files
-            for root, _, files in os.walk(directory_path):
-                for file in tqdm(files):
-                    print(f"==============Processing {file}==============")
-                    file_path = os.path.join(root, file)
-                    if file.endswith('.json'):
-                        reader = JSONReader(
-                            levels_back=0,
-                            collapse_length=200,
-                            ensure_ascii=False,
-                            is_jsonl=False,
-                            clean_json=False,
-                        )
-                        documents = reader.load_data(input_file=file_path, extra_info={})
+            print("\nEmbedding Files")
+            print("-----------------")
+            
+            for root, _, files in os.walk(directory_path):                        
+                input_files=[]                              
+                for file in files:
+                    if file.endswith(".json"):
+                        print("Json file detected")
+                        self.process_json(file)
                     else:
-                        reader = SimpleDirectoryReader(root)
-                        documents = reader.load_data()
+                        input_files.append(os.path.join(directory_path,file))
+                
+                try:    
+                    reader=SimpleDirectoryReader(input_files=input_files)
+                except Exception as e :
+                    print(e)
                     
-                    print(f"--------------Embedding {file}--------------")
-                    for idx, doc in enumerate(documents):
-                        doc_text = doc.get_text()
-                        doc_embedding = self.model.encode([doc_text])[0].tolist()
-                        doc_embeddings.append(doc_embedding)
-                        metadatas.append({"doc": doc_text})
-                        ids.append(str(idx))
+                documents = reader.load_data()     
+                for idx , doc in enumerate(tqdm(documents)):                 
+                    try:
+                        self.collection.add(embeddings=self.model.encode(doc.get_text()).tolist(),
+                                            metadatas=doc.metadata,
+                                            ids=f"{doc.metadata["file_name"]}_{idx}",
+                                            documents=doc.get_text())
+                    except ValueError as v:
+                        print({"error":f"Error adding {file} to collection. {v}"})
+                        
+            """ print(embedding)
+            print(metadata)
+            print(ids)
+            print(content)
+             """
+             
+            print(f"\nCollection {self.collection_name} Loaded")           
+            print("-----------------")
+            print(f"No. of Entries: {self.collection.count()}") 
             
-            self.collection.add(embeddings=doc_embeddings, metadatas=metadatas, ids=ids)
-            
-            return {"message": "Dataset Loaded"}, 200
+                     
+            return {"message": "Dataset Loaded"}
         except Exception as e:
-            return {"error": f"Error loading data: {e}"}, 500
+            return {"error": f"Error loading data: {e}"}
 
     def retrieve_documents(self, query_str):
         try:
-            query_embedding = self.model.encode([query_str])[0].tolist()  # Convert ndarray to list
-            similarities = self.collection.query(query_embeddings=query_embedding,
-                                                 n_results=3)
-            retrieved_docs = []                      
-            
-            metadatas = similarities['metadatas']
-           
-            for metadata in metadatas: 
-                # Check if metadata is a dictionary and contains the 'doc' key
-                if isinstance(metadata, dict) and 'doc' in metadata:
-                    document = metadata['doc']
-                    retrieved_docs.append(document)
-                else:
-                    print("Metadata format is not as expected:", metadata)
-
-            return retrieved_docs
+            similarities = self.collection.query(query_texts=query_str,
+                                                 n_results=3,
+            )
+                                
+            print("-----------------")
+            print(f"Query: '{query_str}'")
+            return similarities["documents"]
+        
         except Exception as e:
-            return {"error": f"Error retrieving documents: {e}"}, 500
-# Example usage
+            return {"error": f"Error retrieving documents: {e}"}
+        
+        
+""" # Example usage
 if __name__ == "__main__":
     # Initialize the DocumentRetrieval class
     doc_retrieval = Dataset(predefined_directory_path=r'G:\My Drive\Dissertation_Database')
@@ -94,7 +109,7 @@ if __name__ == "__main__":
     #print(load_response)
 
     # Retrieve documents based on a query
-    query = "Engineering"
+    query = "I want to start a career in engineering where should i start?"
     retrieve_response = doc_retrieval.retrieve_documents(query)
-    print(retrieve_response)
+    print(retrieve_response) """
 

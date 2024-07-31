@@ -1,43 +1,50 @@
 import json
-import requests
-from sentence_transformers import SentenceTransformer
+import logging
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from sentence_transformers import SentenceTransformer
+from database import Dataset
+import ollama
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Chat:
     def __init__(self):
-        self.api_url = "https://ae85-34-16-203-38.ngrok-free.app"
-        self.api_key = None
-        self.dataset_url = "https://2c57-34-138-57-160.ngrok-free.app"
         self.model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-
-    def hg_login(self):
-        with open("HUGGING_FACE_TOKEN.json", "r") as f:
-            self.api_key = json.load(f)["access_token"]
-        print("Successfully Logged in.")
+        self.database = Dataset(predefined_directory_path=r'G:\My Drive\Dissertation_Database')
+        self.database.load_data()
+        self.ollama_model = "Llama-3"  
 
     def generate_response(self, context):
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        payload = {"inputs": context}
-        response = requests.post(self.api_url, headers=headers, json=payload)
-        return response.json()
+        try:
+            response = ollama.chat_completion(
+                model=self.ollama_model,
+                messages=[{"role": "user", "content": context}],
+                max_tokens=500
+            )
+            return response['choices'][0]['message']['content']
+        except Exception as e:
+            logger.error(f"Error generating response: {e}")
+            return "Sorry, something went wrong. Please try again."
 
     def query(self, query_str):
-        response = requests.post(f"{self.dataset_url}/retrieve_documents", json={"query_str": query_str, "top_k": 3})
-        if response.status_code == 200:
-            retrieved_docs = response.json().get("documents", [])
+        try:
+            retrieved_docs = self.database.retrieve_documents(query_str)
             context = " ".join(retrieved_docs)
             return self.generate_response(context)
-        else:
-            return {"error": "Failed to retrieve documents from dataset app"}
-
+        except Exception as e:
+            logger.error(f"Error retrieving documents: {e}")
+            return {"error": f"Error retrieving documents: {e}"}
+        
     def initialize(self):
-        self.hg_login()
+        pass
+
+chat_instance = Chat()
+chat_instance.initialize()
 
 app = Flask(__name__)
 CORS(app)
-chat_instance = Chat()
-chat_instance.initialize()
 
 @app.route("/")
 def index():
@@ -47,6 +54,8 @@ def index():
 def query():
     data = request.get_json()
     response = chat_instance.query(data["query"])
+    if isinstance(response, dict) and "error" in response:
+        return jsonify(response)
     return jsonify({"response": response})
 
 if __name__ == "__main__":
