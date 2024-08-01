@@ -1,4 +1,3 @@
-import json
 import logging
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
@@ -17,13 +16,18 @@ class Chat:
         self.ollama_model = "Llama-3"  
 
     def generate_response(self, context):
+        print("Generating Response")
         try:
-            response = ollama.chat_completion(
-                model=self.ollama_model,
-                messages=[{"role": "user", "content": context}],
-                max_tokens=500
+            response = ollama.chat(
+                model= 'llama3:latest',
+                messages=[
+                    {
+                        'role':'user',
+                        'content':context
+                    }
+                ]
             )
-            return response['choices'][0]['message']['content']
+            return response['message']['content']
         except Exception as e:
             logger.error(f"Error generating response: {e}")
             return "Sorry, something went wrong. Please try again."
@@ -31,17 +35,14 @@ class Chat:
     def query(self, query_str):
         try:
             retrieved_docs = self.database.retrieve_documents(query_str)
-            context = " ".join(retrieved_docs)
+            context = (f"{query_str} Answer the users question using the following informtation : \n {retrieved_docs}")
             return self.generate_response(context)
         except Exception as e:
             logger.error(f"Error retrieving documents: {e}")
-            return {"error": f"Error retrieving documents: {e}"}
-        
-    def initialize(self):
-        pass
+            return {"error": f"Error retrieving documents: {e}"}    
 
 chat_instance = Chat()
-chat_instance.initialize()
+
 
 app = Flask(__name__)
 CORS(app)
@@ -49,6 +50,8 @@ CORS(app)
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
 
 @app.route("/query", methods=["POST"])
 def query():

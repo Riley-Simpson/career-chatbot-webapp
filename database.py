@@ -14,22 +14,27 @@ class Dataset:
         self.collection = self.client.create_collection(collection_name,metadata={"hnws:space":"cosine"})
         self.predefined_directory_path = predefined_directory_path
 
-
     def process_json(self,file):       
         with open(file, 'r') as f:
             json_file = ujson.load(f)
         
+       
+        def embedded(doc):
+            print('flag3')
+            return self.model.encode(str(doc)).tolist()
+       
         print(f"Adding {file}")
-        for idx,doc in enumerate(json_file):
+        for idx,doc in enumerate(tqdm(json_file)):
             try:
                 self.collection.add(
-                    embeddings=self.model.encode(str(doc), batch_size=128).tolist(),
+                    #embeddings=embedded(doc),
                     metadatas={key: ', '.join(value) if isinstance(value, list) else value for key, value in doc.items() if value not in [None, '', []]},
                     ids=f"{file}_{idx}",
                     documents=str(doc))
                 
             except Exception as e:
                 print(e)
+
                
     def load_data(self, directory_path=None):
         if directory_path is None:
@@ -63,7 +68,7 @@ class Dataset:
                 documents = reader.load_data()     
                 for idx , doc in enumerate(tqdm(documents)):                 
                     try:
-                        self.collection.add(embeddings=self.model.encode(doc.get_text()).tolist(),
+                        self.collection.add(#embeddings=self.model.encode(doc.get_text()).tolist(),
                                             metadatas=doc.metadata,
                                             ids=f"{doc.metadata["file_name"]}_{idx}",
                                             documents=doc.get_text())
@@ -88,18 +93,19 @@ class Dataset:
     def retrieve_documents(self, query_str):
         try:
             similarities = self.collection.query(query_texts=query_str,
-                                                 n_results=3,
-            )
+                                                 n_results=1)
                                 
             print("-----------------")
             print(f"Query: '{query_str}'")
-            return similarities["documents"]
+            print(similarities["documents"])
+            return (similarities["documents"])
         
         except Exception as e:
             return {"error": f"Error retrieving documents: {e}"}
         
         
-""" # Example usage
+""" 
+# Example usage
 if __name__ == "__main__":
     # Initialize the DocumentRetrieval class
     doc_retrieval = Dataset(predefined_directory_path=r'G:\My Drive\Dissertation_Database')
