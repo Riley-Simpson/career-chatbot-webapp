@@ -36,23 +36,21 @@ class Chat:
 chat_instance = Chat()
 
 app = Flask(__name__)
+LOCAL_API_URL = "https://skilled-redbird-needlessly.ngrok-free.app/chat"
 CORS(app)
 
 @app.route("/")
 def index():
     return render_template("index.html")
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.json
+    user_input = data.get('input')
+    if not user_input:
+        return jsonify({"error": "No input provided"}), 400
+    # Send the input to the local API
+    response = requests.post(LOCAL_API_URL, json={'input': user_input})
+    return jsonify(response.json())
 
-@app.route("/query", methods=["POST"])
-def query():
-    """
-     Query chat. This is a REST API call. The response is a JSON object with the following keys.
-          
-     @return JSON object with the response of the query.
-    """
-    data = request.get_json()
-    response = chat_instance.query(data["query"])
-    return jsonify({"response": response})
-
-# Run the app with the default port 5000
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
