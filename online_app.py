@@ -61,10 +61,18 @@ def chat():
 
 # Start ngrok tunnel using the configuration file ngrok.yml
 if __name__ == '__main__':
+    # Ensure ngrok is installed
+    ngrok_path = "ngrok/ngrok.exe"  
+
     # Load the ngrok configuration
-    ngrok_config = conf.PyngrokConfig(config_path="ngrok/ngrok.yml")
-    # Start ngrok tunnel using the configuration file
-    ngrok_tunnel = ngrok.connect(pyngrok_config=ngrok_config, addr="6666")
+    ngrok_config = conf.PyngrokConfig(ngrok_path=ngrok_path, config_path="ngrok/ngrok.yml")
+    
+    try:
+        # Start ngrok tunnel using the configuration file
+        ngrok_tunnel = ngrok.connect(pyngrok_config=ngrok_config, addr="6666")
+    except Exception as e:
+        logger.error(f"Failed to start ngrok tunnel: {e}")
+        exit(1)
 
     print("ngrok URL:", ngrok_tunnel.public_url)
     app.run(host='0.0.0.0', port=6666)
