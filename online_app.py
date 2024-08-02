@@ -2,6 +2,7 @@ import logging
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
+from pyngrok import ngrok, conf
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,13 +45,26 @@ def index():
     return render_template("index.html")
 @app.route('/chat', methods=['POST'])
 def chat():
+    """
+    Send a chat message to a user. This is a wrapper around chat_instance to allow you to use it as a context manager.
+    
+    Returns: 
+        JSON with the response of the chat message or error
+    """
     data = request.json
     user_input = data.get('input')
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
-    # Send the input to the local API
-    response = requests.post(LOCAL_API_URL, json={'input': user_input})
-    return jsonify(response.json())
 
+    response = chat_instance.query(user_input)
+    return jsonify({"response": response})
+
+# Start ngrok tunnel using the configuration file ngrok.yml
 if __name__ == '__main__':
+    # Load the ngrok configuration
+    ngrok_config = conf.PyngrokConfig(config_path="ngrok/ngrok.yml")
+    # Start ngrok tunnel using the configuration file
+    ngrok_tunnel = ngrok.connect(pyngrok_config=ngrok_config, addr="6666")
+
+    print("ngrok URL:", ngrok_tunnel.public_url)
     app.run(host='0.0.0.0', port=6666)
