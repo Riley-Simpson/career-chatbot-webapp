@@ -6,12 +6,12 @@ function sendQuery() {
     addMessage(query, 'user');
     queryInput.value = '';
 
-    fetch('/query', {
+    fetch('/chat', {  
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: query }),
+        body: JSON.stringify({ input: query }),
     })
         .then(response => response.json())
         .then(data => {
