@@ -1,7 +1,0 @@
-authtoken: 2indW9HTerTheJj6PxNZLOTbuqf_oVrxfVgn5dGakC7YiPEY
-version: 2
-tunnels:
-  my-app:
-    proto: http
-    addr: 6666
-    hostname : skilled-redbird-needlessly.ngrok-free.app
