@@ -1,17 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const consentForm = document.getElementById('consent-form');
-    consentForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        if (this.checkValidity()) {
-            localStorage.setItem('consentGiven', 'true');
-            closeModal();
-            showChat();
-        } else {
-            alert("Please fill out the form completely.");
-        }
-    });
-
-    if (!localStorage.getItem('consentGiven')) {
+    const consentGiven = localStorage.getItem('consentGiven');
+    if (!consentGiven) {
         showModal();
     } else {
         showChat();
@@ -30,6 +19,14 @@ function showChat() {
     document.getElementById('chat-box').style.display = 'block';
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
+}
+
+function checkGoogleFormSubmission() {
+    // Here we assume user has filled out the Google Form and clicked "I Agree"
+    // You can add more sophisticated checks if needed
+    localStorage.setItem('consentGiven', 'true');
+    closeModal();
+    showChat();
 }
 
 function sendQuery() {
