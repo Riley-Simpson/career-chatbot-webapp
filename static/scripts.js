@@ -98,4 +98,11 @@ function sendFeedback(message, feedback) {
             if (data.status === 'success') {
                 alert('Thank you for your feedback!');
             } else {
-                alert('Sorry, something went wrong. Please
+                alert('Sorry, something went wrong. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Sorry, something went wrong. Please try again.');
+        });
+}
