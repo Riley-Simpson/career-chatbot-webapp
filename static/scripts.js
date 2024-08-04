@@ -63,7 +63,7 @@ function addMessage(text, sender) {
     messageDiv.classList.add('message', sender);
     messageDiv.textContent = text;
 
-    
+    // Add feedback buttons for bot messages
     if (sender === 'bot') {
         const feedbackDiv = document.createElement('div');
         feedbackDiv.classList.add('feedback');

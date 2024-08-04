@@ -14,7 +14,8 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
+    width: 600px;
+    /* Increased width */
     text-align: center;
 }
 
@@ -25,7 +26,8 @@ h1 {
 .chat-box {
     border: 1px solid #ddd;
     border-radius: 4px;
-    height: 300px;
+    height: 500px;
+    /* Increased height */
     overflow-y: scroll;
     margin-bottom: 10px;
     padding: 10px;
@@ -58,7 +60,8 @@ h1 {
     border: none;
     background: none;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 16px;
+    /* Smaller font size */
     margin-right: 5px;
 }
 
