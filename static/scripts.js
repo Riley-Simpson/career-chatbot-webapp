@@ -22,7 +22,8 @@ function showChat() {
 }
 
 function checkGoogleFormSubmission() {
-    // Assume user has filled out the Google Form and clicked "I Agree"
+    // Here we assume user has filled out the Google Form and clicked "I Agree"
+    // This is a manual check, as you can't programmatically check Google Form submission
     localStorage.setItem('consentGiven', 'true');
     closeModal();
     showChat();
