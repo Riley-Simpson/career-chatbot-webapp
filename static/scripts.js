@@ -36,6 +36,9 @@ function sendQuery() {
     addMessage(query, 'user');
     queryInput.value = '';
 
+    // Show the loading spinner
+    document.getElementById('loading-spinner').style.display = 'block';
+
     fetch('/chat', {
         method: 'POST',
         headers: {
@@ -45,6 +48,9 @@ function sendQuery() {
     })
         .then(response => response.json())
         .then(data => {
+            // Hide the loading spinner
+            document.getElementById('loading-spinner').style.display = 'none';
+
             if (data.response) {
                 addMessage(data.response, 'bot');
             } else {
@@ -52,6 +58,9 @@ function sendQuery() {
             }
         })
         .catch(error => {
+            // Hide the loading spinner
+            document.getElementById('loading-spinner').style.display = 'none';
+
             console.error('Error:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
         });
