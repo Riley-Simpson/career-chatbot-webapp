@@ -128,7 +128,7 @@ button:hover {
     position: static;
     bottom: 0;
     right: 0;
-    width: auto;
+    width: 100%;
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 8px 8px 0 0;
