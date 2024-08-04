@@ -22,8 +22,7 @@ function showChat() {
 }
 
 function checkGoogleFormSubmission() {
-    // Here we assume user has filled out the Google Form and clicked "I Agree"
-    // This is a manual check, as you can't programmatically check Google Form submission
+    // This is a manual check, as we can't programmatically verify Google Form submission
     localStorage.setItem('consentGiven', 'true');
     closeModal();
     showChat();
@@ -63,6 +62,47 @@ function addMessage(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
     messageDiv.textContent = text;
+
+    
+    if (sender === 'bot') {
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.classList.add('feedback');
+
+        const likeButton = document.createElement('button');
+        likeButton.innerHTML = '👍';
+        likeButton.onclick = () => sendFeedback(text, 'like');
+
+        const dislikeButton = document.createElement('button');
+        dislikeButton.innerHTML = '👎';
+        dislikeButton.onclick = () => sendFeedback(text, 'dislike');
+
+        feedbackDiv.appendChild(likeButton);
+        feedbackDiv.appendChild(dislikeButton);
+        messageDiv.appendChild(feedbackDiv);
+    }
+
     messagesDiv.appendChild(messageDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function sendFeedback(message, feedback) {
+    fetch('/feedback', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message, feedback }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Thank you for your feedback!');
+            } else {
+                alert('Sorry, something went wrong. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Sorry, something went wrong. Please try again.');
+        });
 }
