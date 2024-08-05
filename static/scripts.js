@@ -62,7 +62,7 @@ function sendQuery() {
             document.getElementById('loading-spinner').style.display = 'none';
 
             console.error('Error:', error);
-            addMessage('Spinner Error : Sorry, something went wrong. Please try again.', 'bot');
+            addMessage('Sorry, something went wrong. Please try again.' , 'bot');
         });
 }
 
