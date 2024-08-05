@@ -54,7 +54,7 @@ function sendQuery() {
             if (data.response) {
                 addMessage(data.response, 'bot');
             } else {
-                addMessage('Sorry, something went wrong. Please try again.', 'bot');
+                addMessage('Response Error: Sorry, something went wrong. Please try again.', 'bot');
             }
         })
         .catch(error => {
@@ -62,7 +62,7 @@ function sendQuery() {
             document.getElementById('loading-spinner').style.display = 'none';
 
             console.error('Error:', error);
-            addMessage('Sorry, something went wrong. Please try again.', 'bot');
+            addMessage('Spinner Error : Sorry, something went wrong. Please try again.', 'bot');
         });
 }
 
