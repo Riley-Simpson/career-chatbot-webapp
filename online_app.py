@@ -29,7 +29,7 @@ class Chat:
                     return response_data['response']
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
-            return f"Sorry, something went wrong. Please try again.{e}"
+            return "Sorry, something went wrong. Please try again."
 
 async def create_chat_instance():
     # Ensure the ngrok tunnel is running and retrieve the current public URL
@@ -45,7 +45,7 @@ def index():
 
 @app.route('/chat', methods=['POST'])
 async def chat():
-    data = request.json
+    data = await request.get_json()
     user_input = data.get('input')
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
