@@ -33,7 +33,7 @@ class Chat:
 
 async def create_chat_instance():
     # Ensure the ngrok tunnel is running and retrieve the current public URL
-    local_api_url = "https://4ce6-90-194-4-76.ngrok-free.app/chat"
+    local_api_url = "https://3d2b-90-194-4-76.ngrok-free.app/chat"
     return Chat(local_api_url)
 
 app = Flask(__name__)
