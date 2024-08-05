@@ -29,7 +29,7 @@ class Chat:
                     return response_data['response']
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
-            return "Sorry, something went wrong. Please try again."
+            return f"Sorry, something went wrong. Please try again.{e}"
 
 async def create_chat_instance():
     # Ensure the ngrok tunnel is running and retrieve the current public URL
