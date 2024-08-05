@@ -13,7 +13,7 @@ class Chat:
         """
         Initialize the bot. Called by __init__ () to set the bot's local_api_url
         """
-        self.local_api_url = "https://4ce6-90-194-4-76.ngrok-free.app/chat"
+        self.local_api_url = "http-6666-ea67adab-2fd7-4f7a-895a-34690bc0b184/chat"
     async def query(self, query_str):
         """
         Query the API to get information about a query. This is a helper function for the query_to_json function
