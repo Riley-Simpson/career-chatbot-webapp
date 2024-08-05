@@ -29,7 +29,7 @@ class Chat:
                     return response_data['response']
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
-            return "Sorry, something went wrong. Please try again, Error communicating with local API."
+            return f"Sorry, something went wrong. Please try again, Error communicating with local API.{e}"
 
 chat_instance = Chat()
 
