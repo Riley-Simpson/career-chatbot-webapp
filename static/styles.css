@@ -15,7 +15,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 600px;
-    /* Increased width */
+    /* Adjust width if needed */
     text-align: center;
 }
 
@@ -27,30 +27,40 @@ h1 {
     border: 1px solid #ddd;
     border-radius: 4px;
     height: 500px;
-    /* Increased height */
+    /* Adjust height if needed */
     overflow-y: scroll;
     margin-bottom: 10px;
     padding: 10px;
     background-color: #f9f9f9;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 #messages {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
 .message {
-    margin-bottom: 10px;
     padding: 10px;
-    border-radius: 4px;
-    background-color: #e1ffc7;
+    border-radius: 20px;
+    max-width: 60%;
+    word-wrap: break-word;
     position: relative;
 }
 
 .message.user {
     background-color: #c7d9ff;
     align-self: flex-end;
+    text-align: left;
+}
+
+.message.bot {
+    background-color: #e1ffc7;
+    align-self: flex-start;
+    text-align: left;
 }
 
 input[type="text"] {
