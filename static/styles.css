@@ -53,19 +53,6 @@ h1 {
     align-self: flex-end;
 }
 
-.feedback {
-    margin-top: 10px;
-}
-
-.feedback button {
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 16px;
-    /* Smaller font size */
-    margin-right: 5px;
-}
-
 input[type="text"] {
     width: calc(100% - 70px);
     padding: 10px;

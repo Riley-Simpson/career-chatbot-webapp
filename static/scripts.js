@@ -72,46 +72,6 @@ function addMessage(text, sender) {
     messageDiv.classList.add('message', sender);
     messageDiv.textContent = text;
 
-    // Add feedback buttons for bot messages
-    if (sender === 'bot') {
-        const feedbackDiv = document.createElement('div');
-        feedbackDiv.classList.add('feedback');
-
-        const likeButton = document.createElement('button');
-        likeButton.innerHTML = '👍';
-        likeButton.onclick = () => sendFeedback(text, 'like');
-
-        const dislikeButton = document.createElement('button');
-        dislikeButton.innerHTML = '👎';
-        dislikeButton.onclick = () => sendFeedback(text, 'dislike');
-
-        feedbackDiv.appendChild(likeButton);
-        feedbackDiv.appendChild(dislikeButton);
-        messageDiv.appendChild(feedbackDiv);
-    }
-
     messagesDiv.appendChild(messageDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-function sendFeedback(message, feedback) {
-    fetch('/feedback', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message, feedback }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert('Thank you for your feedback!');
-            } else {
-                alert('Sorry, something went wrong. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Sorry, something went wrong. Please try again.');
-        });
 }
