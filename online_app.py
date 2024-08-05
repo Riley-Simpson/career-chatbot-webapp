@@ -23,16 +23,16 @@ class Chat:
         @return The response from the API or "Sorry, something went wrong. Please try again." In this case, the error is logged
         """
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
                 async with session.post(self.local_api_url, json={"context": query_str}) as response:
                     response_data = await response.json()
                     return response_data['response']
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
-            return f"Sorry, something went wrong. Please try again.{e}"
+            return "Sorry, something went wrong. Please try again."
 
 async def create_chat_instance():
-    # Note: Ensure the ngrok tunnel is running and retrieve the current public URL
+    # Ensure the ngrok tunnel is running and retrieve the current public URL
     local_api_url = "https://4ce6-90-194-4-76.ngrok-free.app/chat"
     return Chat(local_api_url)
 
