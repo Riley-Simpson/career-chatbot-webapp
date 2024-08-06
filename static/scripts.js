@@ -109,6 +109,9 @@ function endChatSession() {
     // Display the message before ending the session
     addMessage('You have used your allocated 5 minutes, thank you for your time :)', 'bot');
 
+    // Set session ended flag
+    localStorage.setItem('sessionEnded', 'true');
+
     setTimeout(() => {
         document.getElementById('chat-box').style.display = 'none';
         document.getElementById('query-input').style.display = 'none';
@@ -119,9 +122,6 @@ function endChatSession() {
         if (timerDisplay) {
             timerDisplay.remove();
         }
-
-        // Set session ended flag
-        localStorage.setItem('sessionEnded', 'true');
     }, 5000); // Display the message for 5 seconds before ending the session
 }
 
