@@ -29,7 +29,14 @@ function showChat() {
 
     // Start 5-minute timer if not using backdoor
     if (!localStorage.getItem('backdoor')) {
-        startChatTimer(5);
+        const endTime = localStorage.getItem('endTime');
+        if (endTime) {
+            startChatTimer(new Date(endTime));
+        } else {
+            const newEndTime = new Date(Date.now() + 5 * 60 * 1000);
+            localStorage.setItem('endTime', newEndTime);
+            startChatTimer(newEndTime);
+        }
     }
 }
 
@@ -84,8 +91,7 @@ function addMessage(text, sender) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-function startChatTimer(minutes) {
-    const endTime = Date.now() + minutes * 60 * 1000;
+function startChatTimer(endTime) {
     const timerDisplay = document.createElement('div');
     timerDisplay.id = 'timer';
     timerDisplay.style.position = 'absolute';
@@ -98,7 +104,7 @@ function startChatTimer(minutes) {
     document.body.appendChild(timerDisplay);
 
     const interval = setInterval(() => {
-        const timeLeft = endTime - Date.now();
+        const timeLeft = new Date(endTime) - Date.now();
         if (timeLeft <= 0) {
             clearInterval(interval);
             endChatSession();
@@ -116,6 +122,7 @@ function endChatSession() {
 
     // Set session ended flag
     localStorage.setItem('sessionEnded', 'true');
+    localStorage.removeItem('endTime');
 
     setTimeout(() => {
         document.getElementById('chat-box').style.display = 'none';
@@ -143,9 +150,12 @@ function showSessionEndedMessage() {
 // Function to enable backdoor access (run this in the console)
 function enableBackdoor() {
     localStorage.setItem('backdoor', 'true');
+    localStorage.removeItem('endTime'); // Remove timer to avoid conflicts
 }
 
 // Function to disable backdoor access (run this in the console)
 function disableBackdoor() {
     localStorage.removeItem('backdoor');
+    localStorage.removeItem('sessionEnded'); // Reset session end for normal use
+    window.location.reload(); // Reload to apply changes
 }
