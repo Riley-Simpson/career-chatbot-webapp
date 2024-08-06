@@ -33,7 +33,7 @@ class Chat:
 
 async def create_chat_instance():
     # Ensure the ngrok tunnel is running and retrieve the current public URL
-    local_api_url = "https://skilled-redbird-needlessly.ngrok-free.app/chat"
+    local_api_url = "https://skilled-redbird-needlessly.ngrok-free.app"
     return Chat(local_api_url)
 
 app = Flask(__name__)
@@ -45,7 +45,7 @@ def index():
 
 @app.route('/chat', methods=['POST'])
 async def chat():
-    data = request.get_json()  # Synchronous call
+    data = request.get_json()
     user_input = data.get('input')
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
