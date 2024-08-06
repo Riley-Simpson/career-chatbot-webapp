@@ -9,19 +9,9 @@ logger = logging.getLogger(__name__)
 
 class Chat:
     def __init__(self, local_api_url):
-        """
-        Initialize the bot with the local API URL.
-        """
         self.local_api_url = local_api_url
 
     async def query(self, query_str):
-        """
-        Query the API to get information about a query. This is a helper function for the query_to_json function
-
-        @param query_str - The query string to send to the API
-
-        @return The response from the API or "Sorry, something went wrong. Please try again." In this case, the error is logged
-        """
         try:
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
                 async with session.post(self.local_api_url, json={"context": query_str}) as response:
@@ -32,7 +22,6 @@ class Chat:
             return "Sorry, something went wrong. Please try again."
 
 async def create_chat_instance():
-    # Ensure the ngrok tunnel is running and retrieve the current public URL
     local_api_url = "https://skilled-redbird-needlessly.ngrok-free.app"
     return Chat(local_api_url)
 
@@ -45,7 +34,7 @@ def index():
 
 @app.route('/chat', methods=['POST'])
 async def chat():
-    data = request.get_json()
+    data = await request.get_json()  # Ensure to use await when dealing with async context
     user_input = data.get('input')
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
@@ -59,4 +48,6 @@ async def setup_chat_instance():
     chat_instance = await create_chat_instance()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=6666)
+    # Use asyncio to run the app
+    asyncio.run(app.run(host='0.0.0.0', port=6666))
+
