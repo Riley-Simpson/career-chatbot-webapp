@@ -150,8 +150,8 @@ button:hover {
     display: none;
 }
 
-@keyframes spin {
+@keyframes l7 {
     to {
-        transform: rotate(360deg);
+        transform: rotate(.5turn)
     }
 }
