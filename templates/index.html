@@ -24,14 +24,19 @@
         </div>
         <div class="chat-box" id="chat-box" style="display:none;">
             <div id="messages"></div>
-            <div id="loading-spinner" class="loader"></div>
+            <div id="loading-spinner" class="spinner"></div>
+            <div class="feedback-form" id="chat-feedback-form">
+                <iframe
+                    src="https://docs.google.com/forms/d/e/1FAIpQLSdC3bxESKoKFVEL7cr8CwLykODbvn1QLCwZVJZ080u5hCdsvA/viewform?embedded=true"
+                    width="100%" height="400px" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            </div>
         </div>
         <input type="text" id="query-input" placeholder="Type your query here..." style="display:none;">
         <button onclick="sendQuery()" style="display:none;">Send</button>
     </div>
 
     <!-- Feedback Form Section -->
-    <div class="feedback-form" id="feedback-form" style="display:none;">
+    <div class="feedback-form" id="page-feedback-form" style="display:none;">
         <iframe
             src="https://docs.google.com/forms/d/e/1FAIpQLSdC3bxESKoKFVEL7cr8CwLykODbvn1QLCwZVJZ080u5hCdsvA/viewform?embedded=true"
             width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>

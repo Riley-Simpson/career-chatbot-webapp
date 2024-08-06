@@ -129,7 +129,7 @@ function endChatSession() {
         document.getElementById('chat-box').style.display = 'none';
         document.getElementById('query-input').style.display = 'none';
         document.querySelector('button[onclick="sendQuery()"]').style.display = 'none';
-        document.getElementById('feedback-form').style.display = 'block';
+        document.getElementById('page-feedback-form').style.display = 'block';
 
         const timerDisplay = document.getElementById('timer');
         if (timerDisplay) {
@@ -142,9 +142,9 @@ function showSessionEndedMessage() {
     const container = document.querySelector('.container');
     container.innerHTML = `
         <p>You have used your allocated 5 minutes, thank you for your time :)</p>
-        <div class="feedback-form" id="feedback-form">
+        <div class="feedback-form">
             <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdC3bxESKoKFVEL7cr8CwLykODbvn1QLCwZVJZ080u5hCdsvA/viewform?embedded=true"
-                    width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+                    width="100%" height="400px" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
         </div>`;
 }
 
