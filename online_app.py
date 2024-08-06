@@ -1,8 +1,7 @@
 import logging
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-import aiohttp
-import asyncio
+import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,41 +10,37 @@ class Chat:
     def __init__(self, local_api_url):
         self.local_api_url = local_api_url
 
-    async def query(self, query_str):
+    def query(self, query_str):
         try:
-            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
-                async with session.post(self.local_api_url, json={"context": query_str}) as response:
-                    response_data = await response.json()
-                    return response_data.get('response', 'No response content')
+            response = requests.post(self.local_api_url, json={"context": query_str})
+            response_data = response.json()
+            return response_data.get('response', 'No response content')
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
             return "Sorry, something went wrong. Please try again."
 
-async def create_chat_instance():
+def create_chat_instance():
     local_api_url = "https://skilled-redbird-needlessly.ngrok-free.app"
     return Chat(local_api_url)
 
 app = Flask(__name__)
 CORS(app)
 
+chat_instance = create_chat_instance()
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
 @app.route('/chat', methods=['POST'])
-async def chat():
+def chat():
     data = request.get_json()
     user_input = data.get('input')
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
 
-    response = await chat_instance.query(user_input)
+    response = chat_instance.query(user_input)
     return jsonify({"response": response})
-
-@app.before_first_request
-async def setup_chat_instance():
-    global chat_instance
-    chat_instance = await create_chat_instance()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6666, threaded=True)
