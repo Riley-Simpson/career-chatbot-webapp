@@ -129,7 +129,7 @@ function endChatSession() {
         document.getElementById('chat-box').style.display = 'none';
         document.getElementById('query-input').style.display = 'none';
         document.querySelector('button[onclick="sendQuery()"]').style.display = 'none';
-        document.getElementById('page-feedback-form').style.display = 'block';
+        document.getElementById('feedback-form').style.display = 'block';
 
         const timerDisplay = document.getElementById('timer');
         if (timerDisplay) {
