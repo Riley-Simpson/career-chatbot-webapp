@@ -33,7 +33,7 @@ function showChat() {
         if (endTime) {
             startChatTimer(new Date(endTime));
         } else {
-            const newEndTime = new Date(Date.now() + 5 * 60 * 1000);
+            const newEndTime = new Date(Date.now() + 10 * 60 * 1000);
             localStorage.setItem('endTime', newEndTime);
             startChatTimer(newEndTime);
         }
@@ -69,7 +69,7 @@ function sendQuery() {
             spinner.style.display = 'none'; // Hide the spinner
 
             if (data.response) {
-                addMessage(data.response, 'bot');
+                addMessage(data.response, 'bot', true);
             } else {
                 addMessage('Response Error: Sorry, something went wrong. Please try again.', 'bot');
             }
@@ -82,11 +82,16 @@ function sendQuery() {
         });
 }
 
-function addMessage(text, sender) {
+function addMessage(text, sender, isMarkdown = false) {
     const messagesDiv = document.getElementById('messages');
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
-    messageDiv.textContent = text;
+
+    if (isMarkdown) {
+        messageDiv.innerHTML = marked.parse(text);
+    } else {
+        messageDiv.textContent = text;
+    }
 
     messagesDiv.appendChild(messageDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -141,7 +146,7 @@ function endChatSession() {
 function showSessionEndedMessage() {
     const container = document.querySelector('.container');
     container.innerHTML = `
-        <p>You have used your allocated 5 minutes, thank you for your time :)</p>
+        <p>You have used your allocated 10 minutes, thank you for your time :)</p>
         <div class="feedback-form">
             <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdC3bxESKoKFVEL7cr8CwLykODbvn1QLCwZVJZ080u5hCdsvA/viewform?embedded=true"
                     width="100%" height="400px" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
