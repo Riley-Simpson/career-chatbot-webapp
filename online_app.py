@@ -12,7 +12,7 @@ class Chat:
 
     def query(self, query_str):
         try:
-            response = requests.post(self.local_api_url, json={"context": query_str})
+            response = requests.post(self.local_api_url + "/chat", json={"context": query_str})
             response_data = response.json()
             return response_data.get('response', 'No response content')
         except Exception as e:
