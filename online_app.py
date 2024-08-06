@@ -34,7 +34,7 @@ def index():
 
 @app.route('/chat', methods=['POST'])
 async def chat():
-    data = request.get_json()  
+    data = request.get_json()
     user_input = data.get('input')
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
@@ -48,4 +48,4 @@ async def setup_chat_instance():
     chat_instance = await create_chat_instance()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=6666)
+    app.run(host='0.0.0.0', port=6666, threaded=True)
