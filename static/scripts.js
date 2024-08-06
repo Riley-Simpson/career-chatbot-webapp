@@ -27,13 +27,13 @@ function showChat() {
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
 
-    // Start 5-minute timer if not using backdoor
+    // Start the timer if not using backdoor
     if (!localStorage.getItem('backdoor')) {
         const endTime = localStorage.getItem('endTime');
         if (endTime) {
             startChatTimer(new Date(endTime));
         } else {
-            const newEndTime = new Date(Date.now() + 5 * 60 * 1000);
+            const newEndTime = new Date(Date.now() + 10 * 60 * 1000);
             localStorage.setItem('endTime', newEndTime);
             startChatTimer(newEndTime);
         }
