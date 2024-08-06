@@ -1,8 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
     const consentGiven = localStorage.getItem('consentGiven');
     const sessionEnded = localStorage.getItem('sessionEnded');
+    const backdoor = localStorage.getItem('backdoor');
 
-    if (sessionEnded) {
+    if (backdoor) {
+        showChat();
+    } else if (sessionEnded) {
         showSessionEndedMessage();
     } else if (!consentGiven) {
         showModal();
@@ -24,8 +27,10 @@ function showChat() {
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
 
-    // Start 5-minute timer
-    startChatTimer(5);
+    // Start 5-minute timer if not using backdoor
+    if (!localStorage.getItem('backdoor')) {
+        startChatTimer(5);
+    }
 }
 
 function checkGoogleFormSubmission() {
@@ -133,4 +138,14 @@ function showSessionEndedMessage() {
             <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdC3bxESKoKFVEL7cr8CwLykODbvn1QLCwZVJZ080u5hCdsvA/viewform?embedded=true"
                     width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
         </div>`;
+}
+
+// Function to enable backdoor access (run this in the console)
+function enableBackdoor() {
+    localStorage.setItem('backdoor', 'true');
+}
+
+// Function to disable backdoor access (run this in the console)
+function disableBackdoor() {
+    localStorage.removeItem('backdoor');
 }
