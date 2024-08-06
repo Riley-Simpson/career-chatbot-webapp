@@ -136,6 +136,7 @@ button:hover {
 }
 
 /* Loading spinner styles */
+
 .loader {
     --d: 22px;
     width: 4px;
