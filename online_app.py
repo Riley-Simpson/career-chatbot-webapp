@@ -2,6 +2,7 @@ import logging
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
+from datetime import datetime, timedelta
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,12 +29,27 @@ CORS(app)
 
 chat_instance = create_chat_instance()
 
+# In-memory storage for active session
+active_session = {
+    'user': None,
+    'expiry': None
+}
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    global active_session
+
+    if not active_session['user'] or active_session['expiry'] < datetime.now():
+        # Start new session
+        active_session['user'] = request.remote_addr
+        active_session['expiry'] = datetime.now() + timedelta(minutes=5)
+    elif active_session['user'] != request.remote_addr:
+        return jsonify({'response': 'Chat is currently in use by another user. Please wait your turn.'})
+
     data = request.get_json()
     user_input = data.get('input')
     if not user_input:

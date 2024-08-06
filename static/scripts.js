@@ -19,10 +19,12 @@ function showChat() {
     document.getElementById('chat-box').style.display = 'block';
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
+
+    // Start 5-minute timer
+    startChatTimer();
 }
 
 function checkGoogleFormSubmission() {
-    // This is a manual check, as we can't programmatically verify Google Form submission
     localStorage.setItem('consentGiven', 'true');
     closeModal();
     showChat();
@@ -36,7 +38,6 @@ function sendQuery() {
     addMessage(query, 'user');
     queryInput.value = '';
 
-    // Show the loading spinner
     document.getElementById('loading-spinner').style.display = 'block';
 
     fetch('/chat', {
@@ -48,7 +49,6 @@ function sendQuery() {
     })
         .then(response => response.json())
         .then(data => {
-            // Hide the loading spinner
             document.getElementById('loading-spinner').style.display = 'none';
 
             if (data.response) {
@@ -58,11 +58,10 @@ function sendQuery() {
             }
         })
         .catch(error => {
-            // Hide the loading spinner
             document.getElementById('loading-spinner').style.display = 'none';
 
             console.error('Error:', error);
-            addMessage('Sorry, something went wrong. Please try again.' , 'bot');
+            addMessage('Sorry, something went wrong. Please try again.', 'bot');
         });
 }
 
@@ -74,4 +73,17 @@ function addMessage(text, sender) {
 
     messagesDiv.appendChild(messageDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function startChatTimer() {
+    setTimeout(() => {
+        endChatSession();
+    }, 300000); // 300,000 milliseconds = 5 minutes
+}
+
+function endChatSession() {
+    document.getElementById('chat-box').style.display = 'none';
+    document.getElementById('query-input').style.display = 'none';
+    document.querySelector('button[onclick="sendQuery()"]').style.display = 'none';
+    document.getElementById('feedback-form').style.display = 'block';
 }
