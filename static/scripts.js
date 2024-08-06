@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     const consentGiven = localStorage.getItem('consentGiven');
-    if (!consentGiven) {
+    const sessionEnded = localStorage.getItem('sessionEnded');
+
+    if (sessionEnded) {
+        showFeedbackForm();
+    } else if (!consentGiven) {
         showModal();
     } else {
         showChat();
@@ -111,4 +115,11 @@ function endChatSession() {
     if (timerDisplay) {
         timerDisplay.remove();
     }
+
+    // Set session ended flag
+    localStorage.setItem('sessionEnded', 'true');
+}
+
+function showFeedbackForm() {
+    document.getElementById('feedback-form').style.display = 'block';
 }
