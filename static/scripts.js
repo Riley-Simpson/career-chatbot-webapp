@@ -27,13 +27,13 @@ function showChat() {
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
 
-    // Start the timer if not using backdoor
+    // Start 5-minute timer if not using backdoor
     if (!localStorage.getItem('backdoor')) {
         const endTime = localStorage.getItem('endTime');
         if (endTime) {
             startChatTimer(new Date(endTime));
         } else {
-            const newEndTime = new Date(Date.now() + 10 * 60 * 1000);
+            const newEndTime = new Date(Date.now() + 5 * 60 * 1000);
             localStorage.setItem('endTime', newEndTime);
             startChatTimer(newEndTime);
         }
@@ -54,7 +54,8 @@ function sendQuery() {
     addMessage(query, 'user');
     queryInput.value = '';
 
-    document.getElementById('loading-spinner').style.display = 'block';
+    const spinner = document.getElementById('loading-spinner');
+    spinner.style.display = 'block'; // Show the spinner
 
     fetch('/chat', {
         method: 'POST',
@@ -65,7 +66,7 @@ function sendQuery() {
     })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('loading-spinner').style.display = 'none';
+            spinner.style.display = 'none'; // Hide the spinner
 
             if (data.response) {
                 addMessage(data.response, 'bot');
@@ -74,7 +75,7 @@ function sendQuery() {
             }
         })
         .catch(error => {
-            document.getElementById('loading-spinner').style.display = 'none';
+            spinner.style.display = 'none'; // Hide the spinner
 
             console.error('Error:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
