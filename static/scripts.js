@@ -21,7 +21,7 @@ function showChat() {
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
 
     // Start 5-minute timer
-    startChatTimer();
+    startChatTimer(5);
 }
 
 function checkGoogleFormSubmission() {
@@ -75,10 +75,30 @@ function addMessage(text, sender) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-function startChatTimer() {
-    setTimeout(() => {
-        endChatSession();
-    }, 300000); // 300,000 milliseconds = 5 minutes
+function startChatTimer(minutes) {
+    const endTime = Date.now() + minutes * 60 * 1000;
+    const timerDisplay = document.createElement('div');
+    timerDisplay.id = 'timer';
+    timerDisplay.style.position = 'absolute';
+    timerDisplay.style.bottom = '10px';
+    timerDisplay.style.right = '10px';
+    timerDisplay.style.backgroundColor = '#f9f9f9';
+    timerDisplay.style.padding = '10px';
+    timerDisplay.style.borderRadius = '5px';
+    timerDisplay.style.border = '1px solid #ddd';
+    document.body.appendChild(timerDisplay);
+
+    const interval = setInterval(() => {
+        const timeLeft = endTime - Date.now();
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            endChatSession();
+            return;
+        }
+        const minutesLeft = Math.floor(timeLeft / 1000 / 60);
+        const secondsLeft = Math.floor((timeLeft / 1000) % 60);
+        timerDisplay.textContent = `Time left: ${minutesLeft}:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
+    }, 1000);
 }
 
 function endChatSession() {
@@ -86,4 +106,9 @@ function endChatSession() {
     document.getElementById('query-input').style.display = 'none';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'none';
     document.getElementById('feedback-form').style.display = 'block';
+
+    const timerDisplay = document.getElementById('timer');
+    if (timerDisplay) {
+        timerDisplay.remove();
+    }
 }
