@@ -106,7 +106,7 @@ def chat():
         return jsonify({'response': 'Chat is currently in use by another user. Please wait your turn.'})
 
     data = request.get_json()
-    user_input = data.get('input')
+    user_input = data.get('context')
     # If user input is not provided
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
