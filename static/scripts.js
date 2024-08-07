@@ -3,10 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const sessionEnded = localStorage.getItem('sessionEnded');
     const backdoor = localStorage.getItem('backdoor');
 
+    // Show the chat dialog if the session has been closed.
     if (backdoor) {
         showChat();
+    // Show the modal dialog if the session has ended.
     } else if (sessionEnded) {
         showSessionEndedMessage();
+    // Show modal if the user has not sent the modal.
     } else if (!consentGiven) {
         showModal();
     } else {
@@ -14,22 +17,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+/**
+* Show modal to confirm consent. Called on click of consent button in consent. html. This is a function so we don't have to wait for user to confirm
+*/
 function showModal() {
     document.getElementById('consent-modal').style.display = 'block';
 }
 
+/**
+* Close Consent Modal and make it disappear on click of consent button. This is a hack to avoid flicker
+*/
 function closeModal() {
     document.getElementById('consent-modal').style.display = 'none';
 }
 
+/**
+* Shows and hides chat and start timer if it's not in localStorage. Used to send queries
+*/
 function showChat() {
     document.getElementById('chat-box').style.display = 'block';
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
-    document.getElementById('resume-upload').style.display = 'flex'; // Show the resume upload section
+    document.getElementById('resume-upload').style.display = 'flex'; 
 
+    // If the session is backdoor or backdoor is not set the timer will be started.
     if (!localStorage.getItem('backdoor')) {
         const endTime = localStorage.getItem('endTime');
+        // Starts the chat timer if the end time is set to the current time.
         if (endTime) {
             startChatTimer(new Date(endTime));
         } else {
@@ -40,15 +54,25 @@ function showChat() {
     }
 }
 
+/**
+* Checks if user has consented and if so sets consent given in local storage to true closes the modal
+*/
 function checkGoogleFormSubmission() {
     localStorage.setItem('consentGiven', 'true');
     closeModal();
     showChat();
 }
 
+/**
+* Sends the query to the backend and logs the query. This is called when the user presses the button
+* 
+* 
+* @return { Promise } Resolves with the
+*/
 function sendQuery() {
     const queryInput = document.getElementById('query-input');
     const query = queryInput.value;
+    // If query is not set return false.
     if (!query) return;
 
     addMessage(query, 'user');
@@ -56,6 +80,8 @@ function sendQuery() {
 
     const spinner = document.getElementById('loading-spinner');
     spinner.style.display = 'block';
+
+    console.log('Sending query to backend:', query); // Log the query being sent
 
     fetch('/chat', {
         method: 'POST',
@@ -65,6 +91,7 @@ function sendQuery() {
         body: JSON.stringify({ context: query }),
     })
         .then(response => {
+            // If the response is ok throw an error.
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -74,6 +101,7 @@ function sendQuery() {
             spinner.style.display = 'none';
             console.log('Chat response data:', data);
 
+            // This method is called by the bot.
             if (data.response) {
                 addMessage(data.response, 'bot', true);
             } else {
@@ -87,12 +115,24 @@ function sendQuery() {
         });
 }
 
+/**
+* Resumes upload of file. This is called when user presses resume button. It will try to upload file to Samsung server and display success or failure message.
+* 
+* 
+* @return { Promise } Promise that resolves when upload is resumed or rejects with error message if upload failed
+*/
 function uploadResume() {
     const resumeInput = document.getElementById('resume-input');
     const file = resumeInput.files[0];
+    // If file is not set return false.
     if (!file) return;
 
     const reader = new FileReader();
+    /**
+    * @param event
+    * 
+    * @return { Promise } Resolves with the response from the server or rejects with an error message if there was an error
+    */
     reader.onload = function (event) {
         const fileContent = event.target.result;
         console.log('Uploading resume content:', fileContent);
@@ -105,6 +145,7 @@ function uploadResume() {
             body: JSON.stringify({ fileContent }),
         })
             .then(response => {
+                // If the response is ok throw an error.
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -113,6 +154,7 @@ function uploadResume() {
             .then(data => {
                 console.log('Resume upload response data:', data);
 
+                // Resume upload success or failure.
                 if (data.success) {
                     addMessage('Resume uploaded successfully.', 'bot');
                 } else {
@@ -127,11 +169,19 @@ function uploadResume() {
     reader.readAsText(file);
 }
 
+/**
+* Adds a message to the chat. This is used to display messages that are not part of the message API but are useful for debugging purposes.
+* 
+* @param text - The text of the message. Should be parsable by markdown.
+* @param sender - The sender of the message. Defaults to the currently logged in user.
+* @param isMarkdown - Whether the message is markdown or plain text
+*/
 function addMessage(text, sender, isMarkdown = false) {
     const messagesDiv = document.getElementById('messages');
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
 
+    // Parses the text content of the message.
     if (isMarkdown) {
         messageDiv.innerHTML = marked.parse(text);
     } else {
@@ -142,6 +192,13 @@ function addMessage(text, sender, isMarkdown = false) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
+/**
+* Starts a timer to show how long the user has left the chat session. After this time the chat session is ended
+* 
+* @param endTime - The time when the user should end the chat session
+* 
+* @return { Promise } A promise that resolves when the timer has been started and is resolved when the user should
+*/
 function startChatTimer(endTime) {
     const timerDisplay = document.createElement('div');
     timerDisplay.id = 'timer';
@@ -156,6 +213,7 @@ function startChatTimer(endTime) {
 
     const interval = setInterval(() => {
         const timeLeft = new Date(endTime) - Date.now();
+        // Clear the interval and end the session if timeLeft 0.
         if (timeLeft <= 0) {
             clearInterval(interval);
             endChatSession();
@@ -167,6 +225,9 @@ function startChatTimer(endTime) {
     }, 1000);
 }
 
+/**
+* End chat session with local storage and remove message from local storage for next 5 minutes ( to avoid spam
+*/
 function endChatSession() {
     addMessage('You have used your allocated 5 minutes, thank you for your time :)', 'bot');
 
@@ -177,16 +238,20 @@ function endChatSession() {
         document.getElementById('chat-box').style.display = 'none';
         document.getElementById('query-input').style.display = 'none';
         document.querySelector('button[onclick="sendQuery()"]').style.display = 'none';
-        document.getElementById('resume-upload').style.display = 'none'; // Hide the resume upload section
+        document.getElementById('resume-upload').style.display = 'none'; 
         document.getElementById('feedback-form').style.display = 'block';
 
         const timerDisplay = document.getElementById('timer');
+        // Removes the timer display from the timer display.
         if (timerDisplay) {
             timerDisplay.remove();
         }
     }, 5000);
 }
 
+/**
+* Shows a message to the user that they have used 10 minutes and thank you for their time. Intended to be used in response to session ended
+*/
 function showSessionEndedMessage() {
     const container = document.querySelector('.container');
     container.innerHTML = `
@@ -197,11 +262,17 @@ function showSessionEndedMessage() {
         </div>`;
 }
 
+/**
+* Enables backdoor and removes time to end from localStorage for next time it takes to load the next
+*/
 function enableBackdoor() {
     localStorage.setItem('backdoor', 'true');
     localStorage.removeItem('endTime');
 }
 
+/**
+* Disable backdoor and reload to avoid session issues. This is called on logout and when user logs
+*/
 function disableBackdoor() {
     localStorage.removeItem('backdoor');
     localStorage.removeItem('sessionEnded');
