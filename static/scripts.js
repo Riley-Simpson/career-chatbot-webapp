@@ -163,6 +163,7 @@ function endChatSession() {
         document.getElementById('chat-box').style.display = 'none';
         document.getElementById('query-input').style.display = 'none';
         document.querySelector('button[onclick="sendQuery()"]').style.display = 'none';
+        document.getElementById('resume-upload').style.display = 'none'; // Hide the resume upload section
         document.getElementById('feedback-form').style.display = 'block';
 
         const timerDisplay = document.getElementById('timer');
