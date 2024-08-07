@@ -136,48 +136,37 @@ function uploadResume() {
         return;
     }
 
-    const reader = new FileReader();
+    const formData = new FormData();
+    formData.append('resume', file);
 
-    /**
-     * @param {Event} event
-     * @return {Promise} Resolves with the response from the server or rejects with an error message if there was an error
-     */
-    reader.onload = function (event) {
-        const fileContent = event.target.result;
-        console.log('Uploading resume content:', fileContent);
+    console.log('Uploading resume...');
 
-        fetch('/upload_resume', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ fileContent }),
+    fetch('https://rileysimpson.pythonanywhere.com/upload_resume', {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => {
+            // If the response is not ok, throw an error.
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
         })
-            .then(response => {
-                // If the response is not ok, throw an error.
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Resume upload response data:', data);
+        .then(data => {
+            console.log('Resume upload response data:', data);
 
-                if (data.success) {
-                    addMessage('Resume uploaded successfully.', 'bot');
-                } else {
-                    addMessage('Resume upload failed. Please try again.', 'bot');
-                }
-            })
-            .catch(error => {
-                console.error('Error in uploadResume:', error);
+            if (data.success) {
+                addMessage('Resume uploaded successfully.', 'bot');
+            } else {
                 addMessage('Resume upload failed. Please try again.', 'bot');
-            });
-    };
-
-    // Start reading the file as text.
-    reader.readAsText(file);
+            }
+        })
+        .catch(error => {
+            console.error('Error in uploadResume:', error);
+            addMessage('Resume upload failed. Please try again.', 'bot');
+        });
 }
+
 
 
 /**
