@@ -142,7 +142,7 @@ function uploadResume() {
         const fileContent = event.target.result;
         console.log('Uploading resume content:', fileContent);
 
-        fetch('/upload_resume', {
+        fetch('https://rileysimpson.pythonanywhere.com/upload_resume', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
