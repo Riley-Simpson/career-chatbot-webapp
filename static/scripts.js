@@ -87,7 +87,7 @@ function sendQuery() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ context: query }), // Ensure correct JSON structure
+        body: JSON.stringify({ input: query }), // Ensure correct JSON structure
     })
         .then(response => {
             if (!response.ok) {
@@ -122,16 +122,10 @@ function sendQuery() {
 function uploadResume() {
     const resumeInput = document.getElementById('resume-input');
     const file = resumeInput.files[0];
-    // If file is not set return false.
     if (!file) return;
 
     const reader = new FileReader();
-    /**
-    * @param event
-    * 
-    * @return { Promise } Resolves with the response from the server or rejects with an error message if there was an error
-    */
-    reader.onload = function (event) {
+    reader.onload = function(event) {
         const fileContent = event.target.result;
         console.log('Uploading resume content:', fileContent);
 
@@ -142,44 +136,34 @@ function uploadResume() {
             },
             body: JSON.stringify({ fileContent }),
         })
-            .then(response => {
-                // If the response is ok throw an error.
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Resume upload response data:', data);
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Resume upload response data:', data);
 
-                // Resume upload success or failure.
-                if (data.success) {
-                    addMessage('Resume uploaded successfully.', 'bot');
-                } else {
-                    addMessage('Resume upload failed. Please try again.', 'bot');
-                }
-            })
-            .catch(error => {
-                console.error('Error in uploadResume:', error);
+            if (data.success) {
+                addMessage('Resume uploaded successfully.', 'bot');
+            } else {
                 addMessage('Resume upload failed. Please try again.', 'bot');
-            });
+            }
+        })
+        .catch(error => {
+            console.error('Error in uploadResume:', error);
+            addMessage('Resume upload failed. Please try again.', 'bot');
+        });
     };
     reader.readAsText(file);
 }
 
-/**
-* Adds a message to the chat. This is used to display messages that are not part of the message API but are useful for debugging purposes.
-* 
-* @param text - The text of the message. Should be parsable by markdown.
-* @param sender - The sender of the message. Defaults to the currently logged in user.
-* @param isMarkdown - Whether the message is markdown or plain text
-*/
 function addMessage(text, sender, isMarkdown = false) {
     const messagesDiv = document.getElementById('messages');
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', sender);
 
-    // Parses the text content of the message.
     if (isMarkdown) {
         messageDiv.innerHTML = marked.parse(text);
     } else {
@@ -190,13 +174,6 @@ function addMessage(text, sender, isMarkdown = false) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-/**
-* Starts a timer to show how long the user has left the chat session. After this time the chat session is ended
-* 
-* @param endTime - The time when the user should end the chat session
-* 
-* @return { Promise } A promise that resolves when the timer has been started and is resolved when the user should
-*/
 function startChatTimer(endTime) {
     const timerDisplay = document.createElement('div');
     timerDisplay.id = 'timer';
@@ -211,7 +188,6 @@ function startChatTimer(endTime) {
 
     const interval = setInterval(() => {
         const timeLeft = new Date(endTime) - Date.now();
-        // Clear the interval and end the session if timeLeft 0.
         if (timeLeft <= 0) {
             clearInterval(interval);
             endChatSession();
@@ -222,10 +198,6 @@ function startChatTimer(endTime) {
         timerDisplay.textContent = `Time left: ${minutesLeft}:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
     }, 1000);
 }
-
-/**
-* End chat session with local storage and remove message from local storage for next 5 minutes ( to avoid spam
-*/
 function endChatSession() {
     addMessage('You have used your allocated 5 minutes, thank you for your time :)', 'bot');
 
