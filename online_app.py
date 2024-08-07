@@ -3,7 +3,6 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
 from datetime import datetime, timedelta
-from llama_index.core import SimpleDirectoryReader
 from PyPDF2 import PdfFileReader
 import io
 
