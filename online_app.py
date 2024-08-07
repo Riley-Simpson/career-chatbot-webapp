@@ -49,10 +49,10 @@ def upload_resume():
         return jsonify({'success': False, 'message': 'No file content provided'})
 
     try:
-        processed_content = SimpleDirectoryReader(input_files=[file_content])
+        processed_content = SimpleDirectoryReader(input_files=file_content)
         print(processed_content)
         return jsonify({'success': True, 'processedContent': processed_content})
-    except Exception as e:
+    except ValueError as e:
         return jsonify({'success': False, 'message': str(e)})
 
 if __name__ == '__main__':
