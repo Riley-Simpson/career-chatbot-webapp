@@ -64,9 +64,15 @@ function sendQuery() {
         },
         body: JSON.stringify({ context: query }),
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             spinner.style.display = 'none';
+            console.log('Chat response data:', data);
 
             if (data.response) {
                 addMessage(data.response, 'bot', true);
@@ -76,7 +82,7 @@ function sendQuery() {
         })
         .catch(error => {
             spinner.style.display = 'none';
-            console.error('Error:', error);
+            console.error('Error in sendQuery:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
         });
 }
@@ -89,6 +95,7 @@ function uploadResume() {
     const reader = new FileReader();
     reader.onload = function (event) {
         const fileContent = event.target.result;
+        console.log('Uploading resume content:', fileContent);
 
         fetch('/upload_resume', {
             method: 'POST',
@@ -97,8 +104,15 @@ function uploadResume() {
             },
             body: JSON.stringify({ fileContent }),
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Resume upload response data:', data);
+
                 if (data.success) {
                     addMessage('Resume uploaded successfully.', 'bot');
                 } else {
@@ -106,7 +120,7 @@ function uploadResume() {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error in uploadResume:', error);
                 addMessage('Resume upload failed. Please try again.', 'bot');
             });
     };
@@ -154,7 +168,7 @@ function startChatTimer(endTime) {
 }
 
 function endChatSession() {
-    addMessage('You have used your allocated 10 minutes, thank you for your time :)', 'bot');
+    addMessage('You have used your allocated 5 minutes, thank you for your time :)', 'bot');
 
     localStorage.setItem('sessionEnded', 'true');
     localStorage.removeItem('endTime');
