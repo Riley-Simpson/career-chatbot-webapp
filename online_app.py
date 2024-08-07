@@ -4,7 +4,8 @@ from flask_cors import CORS
 import requests
 from datetime import datetime, timedelta
 from llama_index.core import SimpleDirectoryReader
-
+from PyPDF2 import PdfFileReader
+import io
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,23 +41,30 @@ def create_chat_instance():
 
 app = Flask(__name__)
 
+
+
+def extract_text_from_pdf(file):
+    pdf_reader = PdfFileReader(file)
+    text = ''
+    for page_num in range(pdf_reader.getNumPages()):
+        text += pdf_reader.getPage(page_num).extract_text()
+    return text
+
 @app.route('/upload_resume', methods=['POST'])
 def upload_resume():
-    data = request.get_json()
-    file_content = data.get('fileContent')
+    if 'resume' not in request.files:
+        return jsonify({'success': False, 'message': 'No file part'})
     
-    if not file_content:
-        return jsonify({'success': False, 'message': 'No file content provided'})
+    file = request.files['resume']
+    if file.filename == '':
+        return jsonify({'success': False, 'message': 'No selected file'})
 
     try:
-        processed_content = SimpleDirectoryReader(input_files=file_content)
-        print(processed_content)
-        return jsonify({'success': True, 'processedContent': processed_content})
-    except ValueError as e:
+        file_stream = io.BytesIO(file.read())
+        text = extract_text_from_pdf(file_stream)
+        return jsonify({'success': True, 'text': text})
+    except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 

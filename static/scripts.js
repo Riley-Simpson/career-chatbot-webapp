@@ -26,8 +26,7 @@ function showChat() {
     document.getElementById('chat-box').style.display = 'block';
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
-    document.getElementById('resume-upload').style.display = 'flex'; // Show the resume upload section
-
+    document.getElementById('resume-upload').style.display = 'flex'; 
     if (!localStorage.getItem('backdoor')) {
         const endTime = localStorage.getItem('endTime');
         if (endTime) {
@@ -86,31 +85,25 @@ function uploadResume() {
     const file = resumeInput.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = function (event) {
-        const fileContent = event.target.result;
+    const formData = new FormData();
+    formData.append('resume', file);
 
-        fetch('/upload_resume', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ fileContent }),
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    addMessage('Resume uploaded successfully.', 'bot');
-                } else {
-                    addMessage('Resume upload failed. Please try again.', 'bot');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
+    fetch('/upload_resume', {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addMessage('Resume uploaded successfully.', 'bot');
+            } else {
                 addMessage('Resume upload failed. Please try again.', 'bot');
-            });
-    };
-    reader.readAsText(file);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            addMessage('Resume upload failed. Please try again.', 'bot');
+        });
 }
 
 function addMessage(text, sender, isMarkdown = false) {
