@@ -62,7 +62,7 @@ function sendQuery() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ input: query }),
+        body: JSON.stringify({ context: query }),
     })
         .then(response => response.json())
         .then(data => {
@@ -86,25 +86,31 @@ function uploadResume() {
     const file = resumeInput.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('resume', file);
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const fileContent = event.target.result;
 
-    fetch('/upload_resume', {
-        method: 'POST',
-        body: formData,
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                addMessage('Resume uploaded successfully.', 'bot');
-            } else {
-                addMessage('Resume upload failed. Please try again.', 'bot');
-            }
+        fetch('/upload_resume', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fileContent }),
         })
-        .catch(error => {
-            console.error('Error:', error);
-            addMessage('Resume upload failed. Please try again.', 'bot');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addMessage('Resume uploaded successfully.', 'bot');
+                } else {
+                    addMessage('Resume upload failed. Please try again.', 'bot');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage('Resume upload failed. Please try again.', 'bot');
+            });
+    };
+    reader.readAsText(file);
 }
 
 function addMessage(text, sender, isMarkdown = false) {
