@@ -80,17 +80,17 @@ function sendQuery() {
     const spinner = document.getElementById('loading-spinner');
     spinner.style.display = 'block';
 
-    console.log('Sending query to backend:', query); // Log the query being sent
+    console.log('Sending query to backend:', query); 
 
     const payload = JSON.stringify({ input: query });
-    console.log('Payload being sent:', payload); // Log the payload
+    console.log('Payload being sent:', payload); 
 
-    fetch('https://rileysimpson.pythonanywhere.com/chat', { // Ensure correct URL
+    fetch('https://rileysimpson.pythonanywhere.com/chat', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: payload // Ensure correct JSON structure
+        body: payload 
     })
         .then(response => {
             console.log('Response status:', response.status); // Log response status
