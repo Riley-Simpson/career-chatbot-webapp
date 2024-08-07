@@ -72,7 +72,6 @@ function checkGoogleFormSubmission() {
 function sendQuery() {
     const queryInput = document.getElementById('query-input');
     const query = queryInput.value;
-    // If query is not set return false.
     if (!query) return;
 
     addMessage(query, 'user');
@@ -88,10 +87,9 @@ function sendQuery() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ context: query }),
+        body: JSON.stringify({ context: query }), // Ensure correct JSON structure
     })
         .then(response => {
-            // If the response is ok throw an error.
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -101,7 +99,6 @@ function sendQuery() {
             spinner.style.display = 'none';
             console.log('Chat response data:', data);
 
-            // This method is called by the bot.
             if (data.response) {
                 addMessage(data.response, 'bot', true);
             } else {
@@ -114,6 +111,7 @@ function sendQuery() {
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
         });
 }
+
 
 /**
 * Resumes upload of file. This is called when user presses resume button. It will try to upload file to Samsung server and display success or failure message.
