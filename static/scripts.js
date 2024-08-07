@@ -154,7 +154,7 @@ function startChatTimer(endTime) {
 }
 
 function endChatSession() {
-    addMessage('You have used your allocated 5 minutes, thank you for your time :)', 'bot');
+    addMessage('You have used your allocated 10 minutes, thank you for your time :)', 'bot');
 
     localStorage.setItem('sessionEnded', 'true');
     localStorage.removeItem('endTime');
