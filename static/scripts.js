@@ -136,13 +136,13 @@ function uploadResume() {
     /**
     * @param event
     * 
-    * @return { Promise } Resolves with the response from the server or rejects with an error message if there was an error
+    
     */
     reader.onload = function (event) {
         const fileContent = event.target.result;
         console.log('Uploading resume content:', fileContent);
 
-        fetch('https://rileysimpson.pythonanywhere.com/upload_resume', {
+        fetch('/upload_resume', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -159,7 +159,6 @@ function uploadResume() {
             .then(data => {
                 console.log('Resume upload response data:', data);
 
-                // Resume upload success or failure.
                 if (data.success) {
                     addMessage('Resume uploaded successfully.', 'bot');
                 } else {
