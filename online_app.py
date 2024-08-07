@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
 from datetime import datetime, timedelta
+from llama_index.core import SimpleDirectoryReader
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,6 +37,28 @@ class Chat:
 def create_chat_instance():
     local_api_url = "https://skilled-redbird-needlessly.ngrok-free.app"
     return Chat(local_api_url)
+
+app = Flask(__name__)
+
+@app.route('/upload_resume', methods=['POST'])
+def upload_resume():
+    data = request.get_json()
+    file_content = data.get('fileContent')
+    
+    if not file_content:
+        return jsonify({'success': False, 'message': 'No file content provided'})
+
+    try:
+        processed_content = SimpleDirectoryReader(input_files=[file_content])
+        print(processed_content)
+        return jsonify({'success': True, 'processedContent': processed_content})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
 
 app = Flask(__name__)
 CORS(app)

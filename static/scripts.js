@@ -26,8 +26,8 @@ function showChat() {
     document.getElementById('chat-box').style.display = 'block';
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
+    document.getElementById('resume-upload').style.display = 'flex'; // Show the resume upload section
 
-    // Start 5-minute timer if not using backdoor
     if (!localStorage.getItem('backdoor')) {
         const endTime = localStorage.getItem('endTime');
         if (endTime) {
@@ -55,7 +55,7 @@ function sendQuery() {
     queryInput.value = '';
 
     const spinner = document.getElementById('loading-spinner');
-    spinner.style.display = 'block'; // Show the spinner
+    spinner.style.display = 'block';
 
     fetch('/chat', {
         method: 'POST',
@@ -66,7 +66,7 @@ function sendQuery() {
     })
         .then(response => response.json())
         .then(data => {
-            spinner.style.display = 'none'; // Hide the spinner
+            spinner.style.display = 'none';
 
             if (data.response) {
                 addMessage(data.response, 'bot', true);
@@ -75,11 +75,42 @@ function sendQuery() {
             }
         })
         .catch(error => {
-            spinner.style.display = 'none'; // Hide the spinner
-
+            spinner.style.display = 'none';
             console.error('Error:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
         });
+}
+
+function uploadResume() {
+    const resumeInput = document.getElementById('resume-input');
+    const file = resumeInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const fileContent = event.target.result;
+
+        fetch('/upload_resume', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fileContent }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addMessage('Resume uploaded successfully.', 'bot');
+                } else {
+                    addMessage('Resume upload failed. Please try again.', 'bot');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addMessage('Resume upload failed. Please try again.', 'bot');
+            });
+    };
+    reader.readAsText(file);
 }
 
 function addMessage(text, sender, isMarkdown = false) {
@@ -123,10 +154,8 @@ function startChatTimer(endTime) {
 }
 
 function endChatSession() {
-    // Display the message before ending the session
     addMessage('You have used your allocated 5 minutes, thank you for your time :)', 'bot');
 
-    // Set session ended flag
     localStorage.setItem('sessionEnded', 'true');
     localStorage.removeItem('endTime');
 
@@ -140,7 +169,7 @@ function endChatSession() {
         if (timerDisplay) {
             timerDisplay.remove();
         }
-    }, 5000); // Display the message for 5 seconds before ending the session
+    }, 5000);
 }
 
 function showSessionEndedMessage() {
@@ -153,15 +182,13 @@ function showSessionEndedMessage() {
         </div>`;
 }
 
-// Function to enable backdoor access (run this in the console)
 function enableBackdoor() {
     localStorage.setItem('backdoor', 'true');
-    localStorage.removeItem('endTime'); // Remove timer to avoid conflicts
+    localStorage.removeItem('endTime');
 }
 
-// Function to disable backdoor access (run this in the console)
 function disableBackdoor() {
     localStorage.removeItem('backdoor');
-    localStorage.removeItem('sessionEnded'); // Reset session end for normal use
-    window.location.reload(); // Reload to apply changes
+    localStorage.removeItem('sessionEnded');
+    window.location.reload();
 }
