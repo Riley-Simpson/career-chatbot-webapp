@@ -129,15 +129,19 @@ function sendQuery() {
 function uploadResume() {
     const resumeInput = document.getElementById('resume-input');
     const file = resumeInput.files[0];
-    // If file is not set return false.
-    if (!file) return;
+
+    // If file is not set, return early.
+    if (!file) {
+        console.log('No file selected for upload.');
+        return;
+    }
 
     const reader = new FileReader();
+
     /**
-    * @param event
-    * 
-    
-    */
+     * @param {Event} event
+     * @return {Promise} Resolves with the response from the server or rejects with an error message if there was an error
+     */
     reader.onload = function (event) {
         const fileContent = event.target.result;
         console.log('Uploading resume content:', fileContent);
@@ -150,7 +154,7 @@ function uploadResume() {
             body: JSON.stringify({ fileContent }),
         })
             .then(response => {
-                // If the response is ok throw an error.
+                // If the response is not ok, throw an error.
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -170,8 +174,11 @@ function uploadResume() {
                 addMessage('Resume upload failed. Please try again.', 'bot');
             });
     };
+
+    // Start reading the file as text.
     reader.readAsText(file);
 }
+
 
 /**
 * Adds a message to the chat. This is used to display messages that are not part of the message API but are useful for debugging purposes.
