@@ -82,16 +82,22 @@ function sendQuery() {
 
     console.log('Sending query to backend:', query); // Log the query being sent
 
-    fetch('/chat', {
+    const payload = JSON.stringify({ input: query });
+    console.log('Payload being sent:', payload); // Log the payload
+
+    fetch('https://rileysimpson.pythonanywhere.com/chat', { // Ensure correct URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ context: query }), // Ensure correct JSON structure
+        body: payload // Ensure correct JSON structure
     })
         .then(response => {
+            console.log('Response status:', response.status); // Log response status
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, details: ${text}`);
+                });
             }
             return response.json();
         })
@@ -100,7 +106,7 @@ function sendQuery() {
             console.log('Chat response data:', data);
 
             if (data.response) {
-                addMessage(data.response, 'bot', true);
+                addMessage(data.response, 'bot');
             } else {
                 addMessage('Response Error: Sorry, something went wrong. Please try again.', 'bot');
             }
@@ -111,6 +117,7 @@ function sendQuery() {
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
         });
 }
+
 
 
 /**
