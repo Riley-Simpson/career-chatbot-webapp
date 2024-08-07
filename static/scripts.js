@@ -87,7 +87,7 @@ function sendQuery() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ input: query }), // Ensure correct JSON structure
+        body: JSON.stringify({ context: query }), // Ensure correct JSON structure
     })
         .then(response => {
             if (!response.ok) {
