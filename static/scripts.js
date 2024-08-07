@@ -26,7 +26,8 @@ function showChat() {
     document.getElementById('chat-box').style.display = 'block';
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
-    document.getElementById('resume-upload').style.display = 'flex'; 
+    document.getElementById('resume-upload').style.display = 'flex'; // Show the resume upload section
+
     if (!localStorage.getItem('backdoor')) {
         const endTime = localStorage.getItem('endTime');
         if (endTime) {
