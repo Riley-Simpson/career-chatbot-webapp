@@ -9,9 +9,21 @@ logger = logging.getLogger(__name__)
 
 class Chat:
     def __init__(self, local_api_url):
+        """
+         Initialize the instance. This is called by __init__ and should not be called directly. The local_api_url is the URL of the API that will be used to make requests to the API.
+         
+         @param local_api_url - The URL of the API
+        """
         self.local_api_url = local_api_url
 
     def query(self, query_str):
+        """
+         Query the chat server with query_str and return the response. This is used for debugging and to check the status of the chat
+         
+         @param query_str - The query string to send to the server
+         
+         @return The response of the chat or Sorry if something went wrong. In this case you should try again
+        """
         try:
             response = requests.post(self.local_api_url + "/chat", json={"context": query_str})
             response_data = response.json()
@@ -29,7 +41,6 @@ CORS(app)
 
 chat_instance = create_chat_instance()
 
-# In-memory storage for active session
 active_session = {
     'user': None,
     'expiry': None
@@ -37,12 +48,25 @@ active_session = {
 
 @app.route("/")
 def index():
+    """
+     The index page of the web application. It is used to display the main page of the web application.
+     
+     
+     @return The response to the request as a string or HTML document depending on the type of response being returned. If the response is an HTML document it will be returned
+    """
     return render_template("index.html")
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    """
+     Send chat message to user. This is a web service call and should be used for anyone who wants to chat a user.
+     
+     
+     @return JSON with response or error message if something went wrong. The user is logged in and a message is
+    """
     global active_session
 
+    # If the chatbot is currently in use by another user.
     if not active_session['user'] or active_session['expiry'] < datetime.now():
         # Start new session
         active_session['user'] = request.remote_addr
@@ -52,11 +76,13 @@ def chat():
 
     data = request.get_json()
     user_input = data.get('input')
+    # If user input is not provided
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
 
     response = chat_instance.query(user_input)
     return jsonify({"response": response})
 
+# Run the app if the __main__ is called.
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=6666, threaded=True)
