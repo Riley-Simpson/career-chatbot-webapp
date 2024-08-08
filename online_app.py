@@ -34,38 +34,21 @@ class Chat:
             logger.error(f"Error communicating with local API: {e}")
             return "Sorry, something went wrong. Please try again."
 
+    def upload_resume(self,file):
+        try:
+            print(file)
+            response = requests.post(self.local_api_url + "/upload_resume", json={"file":file})        
+            response_data=response.json()
+            return response_data.get('response', 'No response content')
+        except Exception as e:
+            logger.error(f"Error communicating with local API: {e}")
+            return "Sorry, something went wrong. Please try again."
+
+        pass
+
 def create_chat_instance():
     local_api_url = "https://skilled-redbird-needlessly.ngrok-free.app"
     return Chat(local_api_url)
-
-app = Flask(__name__)
-
-
-
-def extract_text_from_pdf(file):
-    pdf_reader = PdfFileReader(file)
-    text = ''
-    for page_num in range(pdf_reader.getNumPages()):
-        text += pdf_reader.getPage(page_num).extract_text()
-    return text
-
-@app.route('/upload_resume', methods=['POST'])
-def upload_resume():
-    if 'resume' not in request.files:
-        return jsonify({'success': False, 'message': 'No file part'})
-    
-    file = request.files['resume']
-    if file.filename == '':
-        return jsonify({'success': False, 'message': 'No selected file'})
-
-    try:
-        file_stream = io.BytesIO(file.read())
-        text = extract_text_from_pdf(file_stream)
-        return jsonify({'success': True, 'text': text})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)})
-
-
 
 app = Flask(__name__)
 CORS(app)
@@ -113,6 +96,20 @@ def chat():
 
     response = chat_instance.query(user_input)
     return jsonify({"response": response})
+
+@app.route('/upload_resume', methods=['POST'])
+def upload_resume():
+    if 'resume' not in request.files:
+        return jsonify({'success': False, 'message': 'No file part'})
+    
+    file = request.files['resume']
+    
+    if file.filename == '':
+        return jsonify({'success': False, 'message': 'No selected file'})
+
+    response =chat_instance.upload_resume(file)
+    return jsonify({"response":response})    
+    
 
 # Run the app if the __main__ is called.
 if __name__ == '__main__':
