@@ -112,16 +112,14 @@ def upload_resume():
         return jsonify({'success': False, 'message': 'No file part'})
     
     file = request.files['resume']
-    try:
-        file_path = os.path.join('/tmp', file.filename)
-    except Exception as e:
-        logger.error(f"Testing: {e} \n {file_path}")
+    file_path = os.path.join('/tmp', file.filename)
+        
     if file.filename == '':
         return jsonify({'success': False, 'message': 'No selected file'})
     
     try:
         file.save(file_path)
-        resume=chat_instance.upload_resume(file_path)
+        resume=chat_instance.upload_resume(file.filename)
         os.remove(file_path)
         return jsonify({"resume":resume})
     
