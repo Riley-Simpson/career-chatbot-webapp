@@ -39,13 +39,15 @@ class Chat:
             pdf_reader = PdfFileReader(file)
             text = ''
             for page_num in range(pdf_reader.getNumPages()):
-                text += pdf_reader.getPage(page_num).extract_text()
+                page = pdf_reader.getPage(page_num)
+                text += page.extract_text()
+            
             logger.log(text)
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
             return response_data.get('response', 'No response content')
         except Exception as e:
-            logger.error(f"Error communicating with local API: {e}")
+            logger.error(f"Error communicating with local API: {e} \n {text}")
             return "Sorry, something went wrong. Please try again."
 
         pass
