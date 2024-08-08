@@ -149,6 +149,7 @@ function uploadResume() {
         body: formData,
     })
         .then(response => {
+            console.log('Response status:', response.status); 
             if (!response.ok) {
                 return response.text().then(text => {
                     throw new Error(`HTTP error! status: ${response.status}, details: ${text}`);
@@ -172,6 +173,8 @@ function uploadResume() {
             addMessage('Resume upload failed. Please try again.', 'bot');
         });
 }
+
+
 
 
 
