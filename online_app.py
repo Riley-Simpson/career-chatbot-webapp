@@ -4,6 +4,7 @@ from flask_cors import CORS
 import requests
 from datetime import datetime, timedelta
 from PyPDF2 import PdfFileReader
+
 import io
 
 logging.basicConfig(level=logging.INFO)
@@ -36,14 +37,16 @@ class Chat:
 
     def upload_resume(self,file):
         try:
-            resume = open(file,'r')
-            pdf_reader = PdfFileReader(resume)
-            text = ''
-            for page_num in range(pdf_reader.getNumPages()):
-                page = pdf_reader.getPage(page_num)
-                text += page.extract_text()
-            
-            logger.log(text)
+            with open(file,'r') as resume:
+                pdf_reader = PdfFileReader(resume)
+                text = ''
+                for page_num in range(pdf_reader.getNumPages()):
+                    page = pdf_reader.getPage(page_num)
+                    logger.info(page)
+                    
+                    text += page.extract_text()
+                
+            logger.info(text)
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
             return response_data.get('response', 'No response content')
@@ -51,7 +54,7 @@ class Chat:
             logger.error(f"Error communicating with local API: {e} \n {text}")
             return "Sorry, something went wrong. Please try again."
 
-        pass
+        
 
 def create_chat_instance():
     local_api_url = "https://skilled-redbird-needlessly.ngrok-free.app"
