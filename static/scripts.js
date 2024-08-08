@@ -118,7 +118,7 @@ function sendQuery() {
         });
 }
 
-function upload_resume() {
+function uploadResume() {
     const resumeInput = document.getElementById('resume-input');
     const file = resumeInput.files[0];
 
