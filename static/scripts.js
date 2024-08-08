@@ -6,16 +6,33 @@ document.addEventListener("DOMContentLoaded", () => {
     // Show the chat dialog if the session has been closed.
     if (backdoor) {
         showChat();
-    // Show the modal dialog if the session has ended.
+        // Show the modal dialog if the session has ended.
     } else if (sessionEnded) {
         showSessionEndedMessage();
-    // Show modal if the user has not sent the modal.
+        // Show modal if the user has not sent the modal.
     } else if (!consentGiven) {
         showModal();
     } else {
         showChat();
     }
+
+    fetchResumeAdvice();
 });
+
+/**
+* Fetches resume advice from the backend and renders it as Markdown.
+*/
+function fetchResumeAdvice() {
+    fetch('/api/getResumeAdvice')
+        .then(response => response.json())
+        .then(data => {
+            const adviceContainer = document.getElementById('resume-advice-container');
+            const markdown = data.advice;
+            const htmlContent = marked.parse(markdown);
+            adviceContainer.innerHTML = htmlContent;
+        })
+        .catch(error => console.error('Error fetching the advice:', error));
+}
 
 /**
 * Show modal to confirm consent. Called on click of consent button in consent. html. This is a function so we don't have to wait for user to confirm
@@ -38,7 +55,7 @@ function showChat() {
     document.getElementById('chat-box').style.display = 'block';
     document.getElementById('query-input').style.display = 'block';
     document.querySelector('button[onclick="sendQuery()"]').style.display = 'block';
-    document.getElementById('resume-upload').style.display = 'flex'; 
+    document.getElementById('resume-upload').style.display = 'flex';
 
     // If the session is backdoor or backdoor is not set the timer will be started.
     if (!localStorage.getItem('backdoor')) {
@@ -55,7 +72,7 @@ function showChat() {
 }
 
 /**
-* Checks if user has consented and if so sets consent given in local storage to true closes the modal
+* Checks if user has consented and if so sets consent given in local storage to true closes the modal NOTE While this states google forms , microsoft forms was used in compliance with ethical aproval. 
 */
 function checkGoogleFormSubmission() {
     localStorage.setItem('consentGiven', 'true');
@@ -80,17 +97,17 @@ function sendQuery() {
     const spinner = document.getElementById('loading-spinner');
     spinner.style.display = 'block';
 
-    console.log('Sending query to backend:', query); 
+    console.log('Sending query to backend:', query);
 
     const payload = JSON.stringify({ input: query });
-    console.log('Payload being sent:', payload); 
+    console.log('Payload being sent:', payload);
 
-    fetch('/chat', { 
+    fetch('/chat', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: payload 
+        body: payload
     })
         .then(response => {
             console.log('Response status:', response.status); // Log response status
@@ -147,7 +164,7 @@ function uploadResume() {
         body: formData,
     })
         .then(response => {
-            console.log('Response status:', response.status); 
+            console.log('Response status:', response.status);
             if (!response.ok) {
                 return response.text().then(text => {
                     throw new Error(`HTTP error! status: ${response.status}, details: ${text}`);
@@ -171,12 +188,6 @@ function uploadResume() {
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
         });
 }
-
-
-
-
-
-
 
 /**
 * Adds a message to the chat. This is used to display messages that are not part of the message API but are useful for debugging purposes.
@@ -233,7 +244,6 @@ function startChatTimer(endTime) {
         timerDisplay.textContent = `Time left: ${minutesLeft}:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
     }, 1000);
 }
-
 /**
 * End chat session with local storage and remove message from local storage for next 5 minutes ( to avoid spam
 */
