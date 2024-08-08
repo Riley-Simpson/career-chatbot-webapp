@@ -130,9 +130,9 @@ function uploadResume() {
     const resumeInput = document.getElementById('resume-input');
     const file = resumeInput.files[0];
 
-    // If file is not set, return early.
     if (!file) {
         console.log('No file selected for upload.');
+        addMessage('No file selected for upload.', 'bot');
         return;
     }
 
@@ -149,10 +149,10 @@ function uploadResume() {
         body: formData,
     })
         .then(response => {
-            // If the response is not ok, throw an error.
-            
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, details: ${text}`);
+                });
             }
             return response.json();
         })
@@ -160,20 +160,20 @@ function uploadResume() {
             spinner.style.display = 'none';
             console.log('Resume upload response data:', data);
 
-
-            if (data.response) {
+            if (data.success) {
                 addMessage(data.response, 'bot');
             } else {
                 addMessage('Resume upload failed. Please try again.', 'bot');
             }
         })
-        
         .catch(error => {
             spinner.style.display = 'none';
             console.error('Error in uploadResume:', error);
             addMessage('Resume upload failed. Please try again.', 'bot');
         });
 }
+
+
 
 
 
