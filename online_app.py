@@ -40,8 +40,8 @@ class Chat:
             pdf_reader = PdfReader(file)
             text =''
             for page_num in range(len(pdf_reader.pages)()):
-                page = pdf_reader.getPage(page_num)                
-                text += page.extractText()
+                page = pdf_reader.pages[page_num]              
+                text += page.extract_text()
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
             return response_data.get('response', 'No response content')
