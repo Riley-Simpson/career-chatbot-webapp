@@ -37,7 +37,7 @@ class Chat:
     def upload_resume(self,file):
         try:
             print(file)
-            response = requests.post(self.local_api_url + "/upload_resume", json={"file":file})        
+            response = requests.post(self.local_api_url + "/upload_resume", json={"filecontent":file})        
             response_data=response.json()
             return response_data.get('response', 'No response content')
         except Exception as e:
