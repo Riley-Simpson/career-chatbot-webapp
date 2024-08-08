@@ -108,7 +108,7 @@ def chat():
 
 @app.route('/upload_resume', methods=['POST'])
 def upload_resume():
-    if 'file' not in request.files:
+    if 'resume' not in request.files:
         return jsonify({'success': False, 'message': 'No file part'})
     
     file = request.files['resume']
