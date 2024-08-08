@@ -37,15 +37,14 @@ class Chat:
 
     def upload_resume(self,file):
         try:
-            with open(file,'r') as resume:
-                pdf_reader = PdfFileReader(resume)
-                text = ''
-                for page_num in range(pdf_reader.getNumPages()):
-                    page = pdf_reader.getPage(page_num)
-                    logger.info(page)
-                    
-                    text += page.extractText()
+            pdf_reader = PdfFileReader(file)
+            text = ''
+            for page_num in range(pdf_reader.getNumPages()):
+                page = pdf_reader.getPage(page_num)
+                logger.info(page)
                 
+                text += page.extractText()
+            
             logger.info(text)
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
@@ -114,11 +113,12 @@ def upload_resume():
     
     file = request.files['file']
     file_path = os.path.join('/tmp', file.filename)
-    file.save(file_path)
     if file.filename == '':
         return jsonify({'success': False, 'message': 'No selected file'})
     try:
+        file.save(file_path)
         resume=chat_instance.upload_resume(file_path)
+        os.remove(file_path)
         return jsonify({"resume":resume})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
