@@ -37,10 +37,14 @@ class Chat:
 
     def upload_resume(self,file):
         try:
-            pdf_reader = PdfReader(file)
+            try:
+                pdf_reader = PdfReader(file)
+            except Exception as e:
+                logger.error(f"Error reading pdf file: {e}")
             text =''
             for page_num in range(len(pdf_reader.pages)()):
-                page = pdf_reader.pages[page_num]              
+                page = pdf_reader.pages[page_num]
+                logger.error(page)              
                 text += page.extract_text()
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
