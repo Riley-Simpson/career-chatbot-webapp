@@ -4,8 +4,8 @@ from flask_cors import CORS
 import requests
 from datetime import datetime, timedelta
 from PyPDF2 import PdfFileReader
+import os
 
-import io
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -109,13 +109,19 @@ def chat():
 
 @app.route('/upload_resume', methods=['POST'])
 def upload_resume():
-    if 'resume' not in request.files:
+    if 'file' not in request.files:
         return jsonify({'success': False, 'message': 'No file part'})
     
-    file = request.files['resume']
-    
+    file = request.files['file']
+    file_path = os.path.join('/tmp', file.filename)
+    file.save(file_path)
     if file.filename == '':
         return jsonify({'success': False, 'message': 'No selected file'})
+    try:
+        resume=chat_instance.upload_resume(file_path)
+        return jsonify({"resume":resume})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
 
     response =chat_instance.upload_resume(file)
     return jsonify({"response":response})    
