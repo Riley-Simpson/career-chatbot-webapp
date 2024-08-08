@@ -44,7 +44,7 @@ class Chat:
                     page = pdf_reader.getPage(page_num)
                     logger.info(page)
                     
-                    text += page.extract_text()
+                    text += page.extractText()
                 
             logger.info(text)
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
