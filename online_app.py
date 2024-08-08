@@ -38,7 +38,7 @@ class Chat:
     def upload_resume(self,file):
         try:
             pdf_reader = PdfFileReader(file)
-            text = ''
+            text =''
             for page_num in range(pdf_reader.getNumPages()):
                 page = pdf_reader.getPage(page_num)
                 logger.info(page)
@@ -50,7 +50,7 @@ class Chat:
             response_data=response.json()
             return response_data.get('response', 'No response content')
         except Exception as e:
-            logger.error(f"Error communicating with local API: {e} \n {text}")
+            logger.error(f"Error communicating with local API: {e} \n")
             return "Sorry, something went wrong. Please try again."
 
         
