@@ -160,12 +160,14 @@ function uploadResume() {
             spinner.style.display = 'none';
             console.log('Resume upload response data:', data);
 
-            if (data.success) {
-                addMessage('Resume uploaded successfully.', 'bot');
+
+            if (data.response) {
+                addMessage(data.response, 'bot');
             } else {
                 addMessage('Resume upload failed. Please try again.', 'bot');
             }
         })
+        
         .catch(error => {
             spinner.style.display = 'none';
             console.error('Error in uploadResume:', error);
