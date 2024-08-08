@@ -39,10 +39,8 @@ class Chat:
         try:
             pdf_reader = PdfReader(file)
             text =''
-            for page_num in range(pdf_reader.getNumPages()):
-                page = pdf_reader.getPage(page_num)
-                logger.info(page)
-                
+            for page_num in range(len(pdf_reader.pages)()):
+                page = pdf_reader.getPage(page_num)                
                 text += page.extractText()
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
