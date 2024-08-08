@@ -141,7 +141,7 @@ function uploadResume() {
 
     console.log('Uploading resume...');
 
-    fetch('https://rileysimpson.pythonanywhere.com/upload_resume', {
+    fetch('/upload_resume', {
         method: 'POST',
         body: formData,
     })
