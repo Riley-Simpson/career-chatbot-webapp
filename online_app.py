@@ -36,8 +36,12 @@ class Chat:
 
     def upload_resume(self,file):
         try:
-            print(file)
-            response = requests.post(self.local_api_url + "/upload_resume", json={"filecontent":file})        
+            pdf_reader = PdfFileReader(file)
+            text = ''
+            for page_num in range(pdf_reader.getNumPages()):
+                text += pdf_reader.getPage(page_num).extract_text()
+            logger.log(text)
+            response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
             return response_data.get('response', 'No response content')
         except Exception as e:
