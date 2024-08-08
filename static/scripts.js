@@ -118,7 +118,57 @@ function sendQuery() {
         });
 }
 
+function upload_resume() {
+    const resumeInput = document.getElementById('resume-input');
+    const file = resumeInput.files[0];
 
+    if (!file) {
+        console.log('No file selected for upload.');
+        addMessage('No file selected for upload.', 'bot');
+        return;
+    }
+
+    const spinner = document.getElementById('loading-spinner');
+    spinner.style.display = 'block';
+
+    const formData = new FormData();
+    formData.append('resume', file);
+
+    console.log('Uploading resume...');
+
+
+    fetch('/upload_resume', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: payload
+    })
+        .then(response => {
+            console.log('Response status:', response.status); // Log response status
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, details: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            spinner.style.display = 'none';
+            console.log('Chat response data:', data);
+
+            if (data.response) {
+                addMessage(data.response, 'bot');
+            } else {
+                addMessage('Resume upload failed. Please try again.', 'bot');
+            }
+        })
+        .catch(error => {
+            spinner.style.display = 'none';
+            console.error('Error in sendQuery:', error);
+            addMessage('Sorry, something went wrong. Please try again.', 'bot');
+        });
+}
 
 /**
 * Resumes upload of file. This is called when user presses resume button. It will try to upload file to Samsung server and display success or failure message.
@@ -126,7 +176,7 @@ function sendQuery() {
 * 
 * @return { Promise } Promise that resolves when upload is resumed or rejects with error message if upload failed
 */
-function uploadResume() {
+function uploadResume1() {
     const resumeInput = document.getElementById('resume-input');
     const file = resumeInput.files[0];
 
