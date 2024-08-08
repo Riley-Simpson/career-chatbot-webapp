@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
 from datetime import datetime, timedelta
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 import os
 
 
@@ -37,15 +37,13 @@ class Chat:
 
     def upload_resume(self,file):
         try:
-            pdf_reader = PdfFileReader(file)
+            pdf_reader = PdfReader(file)
             text =''
             for page_num in range(pdf_reader.getNumPages()):
                 page = pdf_reader.getPage(page_num)
                 logger.info(page)
                 
                 text += page.extractText()
-            
-            
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
             return response_data.get('response', 'No response content')
