@@ -117,7 +117,7 @@ def upload_resume():
         file.save(file_path)
         response=chat_instance.upload_resume(file_path)
         os.remove(file_path)
-        return jsonify({"response":response})
+        return jsonify({'success':True,'response':response})
     
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
