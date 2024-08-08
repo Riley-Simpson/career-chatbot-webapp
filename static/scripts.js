@@ -136,6 +136,9 @@ function uploadResume() {
         return;
     }
 
+    const spinner = document.getElementById('loading-spinner');
+    spinner.style.display = 'block';
+
     const formData = new FormData();
     formData.append('resume', file);
 
@@ -147,12 +150,14 @@ function uploadResume() {
     })
         .then(response => {
             // If the response is not ok, throw an error.
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
+            spinner.style.display = 'none';
             console.log('Resume upload response data:', data);
 
             if (data.success) {
@@ -162,6 +167,7 @@ function uploadResume() {
             }
         })
         .catch(error => {
+            spinner.style.display = 'none';
             console.error('Error in uploadResume:', error);
             addMessage('Resume upload failed. Please try again.', 'bot');
         });
