@@ -111,9 +111,11 @@ def upload_resume():
     if 'file' not in request.files:
         return jsonify({'success': False, 'message': 'No file part'})
     
-    file = request.files['file']
-    raise(file.filename)
-    file_path = os.path.join('/tmp', file.filename)
+    file = request.files['resume']
+    try:
+        file_path = os.path.join('/tmp', file.filename)
+    except Exception as e:
+        logger.error(f"Testing: {e} \n {file_path}")
     if file.filename == '':
         return jsonify({'success': False, 'message': 'No selected file'})
     
