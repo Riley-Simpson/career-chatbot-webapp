@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showChat();
     }
 
-    fetchResumeAdvice();
+    fetchResumeAdvice(); // Call to fetch resume advice
 });
 
 /**
@@ -26,10 +26,8 @@ function fetchResumeAdvice() {
     fetch('/api/getResumeAdvice')
         .then(response => response.json())
         .then(data => {
-            const adviceContainer = document.getElementById('resume-advice-container');
             const markdown = data.advice;
-            const htmlContent = marked.parse(markdown);
-            adviceContainer.innerHTML = htmlContent;
+            addMessage(markdown, 'bot', true); // Add as a bot message with Markdown
         })
         .catch(error => console.error('Error fetching the advice:', error));
 }
@@ -72,7 +70,7 @@ function showChat() {
 }
 
 /**
-* Checks if user has consented and if so sets consent given in local storage to true closes the modal NOTE While this states google forms , microsoft forms was used in compliance with ethical aproval. 
+* Checks if user has consented and if so sets consent given in local storage to true closes the modal
 */
 function checkGoogleFormSubmission() {
     localStorage.setItem('consentGiven', 'true');
@@ -123,7 +121,7 @@ function sendQuery() {
             console.log('Chat response data:', data);
 
             if (data.response) {
-                addMessage(data.response, 'bot');
+                addMessage(data.response, 'bot', true); // Display as bot message with Markdown support
             } else {
                 addMessage('Response Error: Sorry, something went wrong. Please try again.', 'bot');
             }
@@ -177,14 +175,14 @@ function uploadResume() {
             console.log('Chat response data:', data);
 
             if (data.response) {
-                addMessage(data.response, 'bot');
+                addMessage(data.response, 'bot', true); // Display as bot message with Markdown support
             } else {
-                addMessage('Failed to read resume , please try again.', 'bot');
+                addMessage('Failed to read resume, please try again.', 'bot');
             }
         })
         .catch(error => {
             spinner.style.display = 'none';
-            console.error('Error in sendQuery:', error);
+            console.error('Error in uploadResume:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
         });
 }
@@ -244,6 +242,7 @@ function startChatTimer(endTime) {
         timerDisplay.textContent = `Time left: ${minutesLeft}:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
     }, 1000);
 }
+
 /**
 * End chat session with local storage and remove message from local storage for next 5 minutes ( to avoid spam
 */
@@ -257,7 +256,7 @@ function endChatSession() {
         document.getElementById('chat-box').style.display = 'none';
         document.getElementById('query-input').style.display = 'none';
         document.querySelector('button[onclick="sendQuery()"]').style.display = 'none';
-        document.getElementById('resume-upload').style.display = 'none'; 
+        document.getElementById('resume-upload').style.display = 'none';
         document.getElementById('feedback-form').style.display = 'block';
 
         const timerDisplay = document.getElementById('timer');
