@@ -45,7 +45,7 @@ class Chat:
                 
                 text += page.extractText()
             
-            logger.info(text)
+            
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
             return response_data.get('response', 'No response content')
@@ -112,20 +112,20 @@ def upload_resume():
         return jsonify({'success': False, 'message': 'No file part'})
     
     file = request.files['file']
+    raise(file.filename)
     file_path = os.path.join('/tmp', file.filename)
     if file.filename == '':
         return jsonify({'success': False, 'message': 'No selected file'})
+    
     try:
         file.save(file_path)
         resume=chat_instance.upload_resume(file_path)
         os.remove(file_path)
         return jsonify({"resume":resume})
+    
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
-    response =chat_instance.upload_resume(file)
-    return jsonify({"response":response})    
-    
 
 # Run the app if the __main__ is called.
 if __name__ == '__main__':
