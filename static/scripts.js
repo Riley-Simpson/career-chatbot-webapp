@@ -86,7 +86,7 @@ function sendQuery() {
     const payload = JSON.stringify({ input: query });
     console.log('Payload being sent:', payload);
 
-    fetch('/chat', {
+    fetch('https://rileysimpson.pythonanywhere.com/chat', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
