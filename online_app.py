@@ -36,7 +36,8 @@ class Chat:
 
     def upload_resume(self,file):
         try:
-            pdf_reader = PdfFileReader(file)
+            resume = open(file,'r')
+            pdf_reader = PdfFileReader(resume)
             text = ''
             for page_num in range(pdf_reader.getNumPages()):
                 page = pdf_reader.getPage(page_num)
