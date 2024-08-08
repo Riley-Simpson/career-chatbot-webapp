@@ -117,7 +117,7 @@ def upload_resume():
     
     try:
         file.save(file_path)
-        resume=chat_instance.upload_resume(file.filename)
+        resume=chat_instance.upload_resume(file_path)
         os.remove(file_path)
         return jsonify({"resume":resume})
     
