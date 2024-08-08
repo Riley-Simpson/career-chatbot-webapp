@@ -15,22 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         showChat();
     }
-
-    fetchResumeAdvice(); // Call to fetch resume advice
 });
 
-/**
-* Fetches resume advice from the backend and renders it as Markdown.
-*/
-function fetchResumeAdvice() {
-    fetch('/api/getResumeAdvice')
-        .then(response => response.json())
-        .then(data => {
-            const markdown = data.advice;
-            addMessage(markdown, 'bot', true); // Add as a bot message with Markdown
-        })
-        .catch(error => console.error('Error fetching the advice:', error));
-}
 
 /**
 * Show modal to confirm consent. Called on click of consent button in consent. html. This is a function so we don't have to wait for user to confirm
@@ -121,7 +107,8 @@ function sendQuery() {
             console.log('Chat response data:', data);
 
             if (data.response) {
-                addMessage(data.response, 'bot', true); // Display as bot message with Markdown support
+                const markdown = data.response;
+                addMessage(markdown, 'bot', true);
             } else {
                 addMessage('Response Error: Sorry, something went wrong. Please try again.', 'bot');
             }
@@ -175,7 +162,8 @@ function uploadResume() {
             console.log('Chat response data:', data);
 
             if (data.response) {
-                addMessage(data.response, 'bot', true); // Display as bot message with Markdown support
+                const markdown = data.response;
+                addMessage(markdown, 'bot', true);
             } else {
                 addMessage('Failed to read resume, please try again.', 'bot');
             }
