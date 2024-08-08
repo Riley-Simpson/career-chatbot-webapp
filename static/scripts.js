@@ -83,7 +83,7 @@ function sendQuery() {
 
     console.log('Sending query to backend:', query);
 
-    const payload = JSON.stringify({ input: query });
+    const payload = JSON.stringify({ context: query });
     console.log('Payload being sent:', payload);
 
     fetch('https://rileysimpson.pythonanywhere.com/chat', {
