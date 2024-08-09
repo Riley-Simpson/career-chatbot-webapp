@@ -72,18 +72,8 @@ function checkGoogleFormSubmission() {
 */
 function sendQuery() {
     const queryInput = document.getElementById('query-input');
-    const sendButton = document.getElementById('send-button');  
-    const resumeUploadButton = document.getElementById('resume-upload-button');
-
     const query = queryInput.value;
     if (!query) return;
-
-    queryInput.disabled = true;
-    queryInput.classList.add('grayed-out');
-    sendButton.disabled = true;
-    sendButton.classList.add('grayed-out');
-    resumeUploadButton.disabled = true;
-    resumeUploadButton.classList.add('grayed-out');
 
     addMessage(query, 'user');
     queryInput.value = '';
@@ -104,7 +94,7 @@ function sendQuery() {
         body: payload
     })
         .then(response => {
-            console.log('Response status:', response.status); 
+            console.log('Response status:', response.status); // Log response status
             if (!response.ok) {
                 return response.text().then(text => {
                     throw new Error(`HTTP error! status: ${response.status}, details: ${text}`);
@@ -127,31 +117,17 @@ function sendQuery() {
             spinner.style.display = 'none';
             console.error('Error in sendQuery:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
-        })
-        .finally(() => {
-            // Re-enable input and buttons and remove grayed-out effect
-            queryInput.disabled = false;
-            queryInput.classList.remove('grayed-out');
-            sendButton.disabled = false;
-            sendButton.classList.remove('grayed-out');
-            resumeUploadButton.disabled = false;
-            resumeUploadButton.classList.remove('grayed-out');
         });
 }
-
 
 /**
 * Resumes upload of file. This is called when user presses resume button. It will try to upload file to Samsung server and display success or failure message.
 * 
 * 
-* @return { Promise } 
+* @return { Promise } Promise that resolves when upload is resumed or rejects with error message if upload failed
 */
 function uploadResume() {
     const resumeInput = document.getElementById('resume-input');
-    const queryInput = document.getElementById('query-input');
-    const sendButton = document.getElementById('send-button');  
-    const resumeUploadButton = document.getElementById('resume-upload-button');
-
     const file = resumeInput.files[0];
 
     if (!file) {
@@ -160,15 +136,6 @@ function uploadResume() {
         return;
     }
 
-    resumeInput.disabled = true;
-    resumeInput.classList.add('grayed-out');
-    queryInput.disabled = true;
-    queryInput.classList.add('grayed-out');
-    sendButton.disabled = true;
-    sendButton.classList.add('grayed-out');
-    resumeUploadButton.disabled = true;
-    resumeUploadButton.classList.add('grayed-out');
-
     const spinner = document.getElementById('loading-spinner');
     spinner.style.display = 'block';
 
@@ -176,8 +143,7 @@ function uploadResume() {
     formData.append('resume', file);
 
     console.log('Uploading resume...');
-    addMessage('Reading resume...', 'bot');
-
+    addMessage('Reading resume...' , bot)
     fetch('/upload_resume', {
         method: 'POST',
         body: formData,
@@ -206,16 +172,6 @@ function uploadResume() {
             spinner.style.display = 'none';
             console.error('Error in uploadResume:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
-        })
-        .finally(() => {
-            resumeInput.disabled = false;
-            resumeInput.classList.remove('grayed-out');
-            queryInput.disabled = false;
-            queryInput.classList.remove('grayed-out');
-            sendButton.disabled = false;
-            sendButton.classList.remove('grayed-out');
-            resumeUploadButton.disabled = false;
-            resumeUploadButton.classList.remove('grayed-out');
         });
 }
 
