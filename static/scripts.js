@@ -73,7 +73,7 @@ function checkGoogleFormSubmission() {
 function sendQuery() {
     const queryInput = document.getElementById('query-input');
     const sendButton = document.getElementById('send-button');  
-    const resumeUploadButton = document.getElementById('resume-upload');
+    const resumeUploadButton = document.getElementById('resume-upload-button');
 
     const query = queryInput.value;
     if (!query) return;
@@ -150,7 +150,7 @@ function uploadResume() {
     const resumeInput = document.getElementById('resume-input');
     const queryInput = document.getElementById('query-input');
     const sendButton = document.getElementById('send-button');  
-    const resumeUploadButton = document.getElementById('resume-upload');
+    const resumeUploadButton = document.getElementById('resume-upload-button');
 
     const file = resumeInput.files[0];
 
