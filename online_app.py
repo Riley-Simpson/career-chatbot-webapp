@@ -7,7 +7,7 @@ from PyPDF2 import PdfReader
 import os
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename='/home/RileySimpson/career-chatbot-webapp/app.log',level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Chat:
