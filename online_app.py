@@ -32,7 +32,7 @@ class Chat:
                 self.past_interactions = "You are a Career Chatbot and you will answer the user's question using the following information only note this information was not submitted by the user but rather suplemental information from a R.A.G database."
                 logger.info("Reset past interactions")
                 
-            context = (f"\n {self.past_interactions} \nUser Query: {query_str}")
+            context = (f"\n {self.past_interactions}\nUser Query: {query_str}")
             
             response = requests.post(self.local_api_url + "/chat", json={"context": context})
             response_data = response.json()
