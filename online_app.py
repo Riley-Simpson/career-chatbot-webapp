@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 from flask_cors import CORS
 import requests
 from datetime import datetime, timedelta
@@ -9,6 +9,12 @@ import os
 
 app = Flask(__name__)
 CORS(app)
+app.secret_key = 'dsjlakcfwempo'
+
+active_session = {
+    'user': None,
+    'expiry': None
+}
 
 logging.basicConfig(filename='online_app.log',level=logging.INFO)
 file_handler = logging.FileHandler('/home/RileySimpson/career-chatbot-webapp/')
@@ -34,16 +40,18 @@ class Chat:
          @return The response of the chat or Sorry if something went wrong. In this case you should try again
         """
         try:
-            if not self.past_interactions:
-                self.past_interactions = "You are a Career Chatbot and you will answer the user's question using the following information only note this information was not submitted by the user but rather suplemental information from a R.A.G database."
+            if 'chat_history' not in session:
+                session['chat_history'] = "You are a Career Chatbot and you will answer the user's question using the following information only note this information was not submitted by the user but rather supplemental information from a R.A.G database."
                 logger.info("Reset past interactions")
                 
-            context = (f"\n {self.past_interactions}\nUser Query: {query_str}")
+            context = f"\n{session['chat_history']} \nUser Query: {query_str}"
             
             response = requests.post(self.local_api_url + "/chat", json={"context": context})
             response_data = response.json()
-            self.past_interactions += f"\nHistory: {context} \nUser: {query_str} \nBot: {response_data.get('response')}"
-            logger.info(f"past interactions set to: \n{self.past_interactions}")            
+            session['chat_history'] += f"\nUser: {query_str}\nBot: {response_data.get('response')}"
+            
+            logger.info(f"past interactions set to: \n{session['chat_history']}")            
+            
             return response_data.get('response', 'No response content')
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
@@ -72,12 +80,6 @@ def create_chat_instance():
 chat_instance = create_chat_instance()
 
 
-
-active_session = {
-    'user': None,
-    'expiry': None
-}
-
 @app.route("/")
 def index():
     """
@@ -102,8 +104,8 @@ def chat():
         # Start new session
         active_session['user'] = request.remote_addr
         active_session['expiry'] = datetime.now() + timedelta(minutes=10)
-        active_session['chat_history'] = "" 
-        logger.info("New session started.")
+        session['chat_history'] = "" #Clear chat logs
+        
     elif active_session['user'] != request.remote_addr:
         return jsonify({'response': 'Chat is currently in use by another user. Please wait your turn.'})
 
@@ -113,11 +115,8 @@ def chat():
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
 
-    chat_instance.past_interactions = active_session['chat_history']
     response = chat_instance.query(user_input)
-    active_session['chat_history'] = chat_instance.past_interactions
 
-    logger.info(f"Session history after update: {active_session['chat_history']}")
     return jsonify({"response": response})
 
 @app.route('/upload_resume', methods=['POST'])
