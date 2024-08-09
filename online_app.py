@@ -28,7 +28,7 @@ class Chat:
          @return The response of the chat or Sorry if something went wrong. In this case you should try again
         """
         try:
-            if len(self.past_interactions) < 1 :
+            if not self.past_interactions:
                 self.past_interactions = "You are a Career Chatbot and you will answer the user's question using the following information only note this information was not submitted by the user but rather suplemental information from a R.A.G database."
             
             context = (f"\n History: {self.past_interactions} \nUser Query: {query_str}")
