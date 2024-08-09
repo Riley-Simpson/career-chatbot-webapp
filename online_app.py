@@ -93,6 +93,7 @@ def index():
      @return The response to the request as a string or HTML document depending on the type of response being returned. If the response is an HTML document it will be returned
     """
     session.pop('chat_history', None)
+    logger.info('------------------------------New Session------------------------------\n')
     return render_template("index.html")
 
 @app.route('/chat', methods=['POST'])
@@ -109,8 +110,6 @@ def chat():
         # Start new session
         active_session['user'] = request.remote_addr
         active_session['expiry'] = datetime.now() + timedelta(minutes=10)
-        session['chat_history'] = "" #Clear chat logs
-        
     elif active_session['user'] != request.remote_addr:
         return jsonify({'response': 'Chat is currently in use by another user. Please wait your turn.'})
 
