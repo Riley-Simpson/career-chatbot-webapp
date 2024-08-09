@@ -75,6 +75,10 @@ function sendQuery() {
     const query = queryInput.value;
     if (!query) return;
 
+    queryInput.disabled = true;
+    sendButton.disabled = true;
+    resumeUploadButton.disabled = true;
+
     addMessage(query, 'user');
     queryInput.value = '';
 
@@ -117,7 +121,13 @@ function sendQuery() {
             spinner.style.display = 'none';
             console.error('Error in sendQuery:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
+        })
+        .finally(() => {
+            queryInput.disabled = false;
+            sendButton.disabled = false;
+            resumeUploadButton.disabled = false;
         });
+    
 }
 
 /**
@@ -135,6 +145,10 @@ function uploadResume() {
         addMessage('No file selected for upload.', 'bot');
         return;
     }
+    resumeInput.disabled = true;
+    queryInput.disabled = true;
+    sendButton.disabled = true;
+    resumeUploadButton.disabled = true;
 
     const spinner = document.getElementById('loading-spinner');
     spinner.style.display = 'block';
@@ -172,9 +186,14 @@ function uploadResume() {
             spinner.style.display = 'none';
             console.error('Error in uploadResume:', error);
             addMessage('Sorry, something went wrong. Please try again.', 'bot');
+        })
+        .finally(() => {
+            resumeInput.disabled = false;
+            queryInput.disabled = false;
+            sendButton.disabled = false;
+            resumeUploadButton.disabled = false;
         });
-}
-
+    }
 /**
 * Adds a message to the chat. This is used to display messages that are not part of the message API but are useful for debugging purposes.
 * 
