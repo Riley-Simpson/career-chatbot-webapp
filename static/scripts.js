@@ -72,6 +72,9 @@ function checkGoogleFormSubmission() {
 */
 function sendQuery() {
     const queryInput = document.getElementById('query-input');
+    const sendButton = document.querySelector('button[onclick="sendQuery()"]');
+    const resumeUploadButton = document.getElementById('resume-upload');
+
     const query = queryInput.value;
     if (!query) return;
 
@@ -134,11 +137,13 @@ function sendQuery() {
 * Resumes upload of file. This is called when user presses resume button. It will try to upload file to Samsung server and display success or failure message.
 * 
 * 
-* @return { Promise } Promise that resolves when upload is resumed or rejects with error message if upload failed
+* @return { Promise } 
 */
 function uploadResume() {
     const resumeInput = document.getElementById('resume-input');
     const file = resumeInput.files[0];
+    const resumeUploadButton = document.getElementById('resume-upload');
+    const sendButton = document.querySelector('button[onclick="sendQuery()"]');
 
     if (!file) {
         console.log('No file selected for upload.');
