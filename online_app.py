@@ -54,7 +54,7 @@ class Chat:
             response_data = response.json()
             session['chat_history'] += f"\nUser: {query_str}\nBot: {response_data.get('response')}"
             
-            logger.info(f"past interactions set to: \n{session['chat_history']}")            
+            logger.info(f"('------------------------------\nPast interactions set to: \n{session['chat_history']}")            
             
             return response_data.get('response', 'No response content')
         except Exception as e:
