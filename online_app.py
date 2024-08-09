@@ -7,17 +7,14 @@ from PyPDF2 import PdfReader
 import os
 
 
+app = Flask(__name__)
+CORS(app)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler('/home/RileySimpson/career-chatbot-webapp/app.log'),
-        logging.StreamHandler()  # Also output to console
-    ]
-)
-
+logging.basicConfig(filename='online_app.log',level=logging.INFO)
+file_handler = logging.FileHandler('/home/RileySimpson/career-chatbot-webapp/')
+app.logger.addHandler(file_handler)
 logger = logging.getLogger(__name__)
+
 
 class Chat:
     def __init__(self, local_api_url):
@@ -74,8 +71,6 @@ def create_chat_instance():
 
 chat_instance = create_chat_instance()
 
-app = Flask(__name__)
-CORS(app)
 
 
 active_session = {
