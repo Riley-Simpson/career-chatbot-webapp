@@ -16,8 +16,8 @@ active_session = {
     'expiry': None
 }
 
-logging.basicConfig(filename='online_app_log.log',level=logging.INFO)
-file_handler = logging.FileHandler('/home/RileySimpson/career-chatbot-webapp/')
+logging.basicConfig(filename='/home/RileySimpson/career-chatbot-webapp/online_app_log.log',level=logging.INFO)
+file_handler = logging.FileHandler('/home/RileySimpson/career-chatbot-webapp/online_app_log.log')
 app.logger.addHandler(file_handler)
 logger = logging.getLogger(__name__)
 
