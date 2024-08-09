@@ -18,7 +18,7 @@ class Chat:
          @param local_api_url - The URL of the API
         """
         self.local_api_url = local_api_url
-        
+        self.past_interactions = ""
     def query(self, query_str):
         """
          Query the chat server with query_str and return the response. This is used for debugging and to check the status of the chat
@@ -35,7 +35,7 @@ class Chat:
             
             response = requests.post(self.local_api_url + "/chat", json={"context": context})
             response_data = response.json()
-            self.past_interactions = response_data.get('response')
+            self.past_interactions += f"\nHistory: {context} \nUser: {query_str} \nBot: {response_data.get('response')}"
             return response_data.get('response', 'No response content')
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
@@ -95,7 +95,8 @@ def chat():
     if not active_session['user'] or active_session['expiry'] < datetime.now():
         # Start new session
         active_session['user'] = request.remote_addr
-        active_session['expiry'] = datetime.now() + timedelta(minutes=5)
+        active_session['expiry'] = datetime.now() + timedelta(minutes=10)
+        active_session['chat_history'] = "" 
     elif active_session['user'] != request.remote_addr:
         return jsonify({'response': 'Chat is currently in use by another user. Please wait your turn.'})
 
@@ -105,7 +106,9 @@ def chat():
     if not user_input:
         return jsonify({"error": "No input provided"}), 400
 
+    chat_instance.past_interactions = active_session['chat_history']
     response = chat_instance.query(user_input)
+    active_session['chat_history'] = chat_instance.past_interactions
     return jsonify({"response": response})
 
 @app.route('/upload_resume', methods=['POST'])
