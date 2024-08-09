@@ -18,7 +18,7 @@ class Chat:
          @param local_api_url - The URL of the API
         """
         self.local_api_url = local_api_url
-        self.past_interactions = ''
+        
     def query(self, query_str):
         """
          Query the chat server with query_str and return the response. This is used for debugging and to check the status of the chat
