@@ -16,9 +16,11 @@ active_session = {
     'expiry': None
 }
 
-logging.basicConfig(filename='/home/RileySimpson/career-chatbot-webapp/online_app_log.log',level=logging.INFO)
-file_handler = logging.FileHandler('/home/RileySimpson/career-chatbot-webapp/online_app_log.log')
-app.logger.addHandler(file_handler)
+logging.basicConfig(
+    filename='/home/RileySimpson/career-chatbot-webapp/online_app_log.log',
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+)
 logger = logging.getLogger(__name__)
 
 
