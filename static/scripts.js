@@ -143,7 +143,7 @@ function uploadResume() {
     formData.append('resume', file);
 
     console.log('Uploading resume...');
-    addMessage('Reading resume...' , bot)
+    addMessage('Reading resume...' , 'bot')
     fetch('/upload_resume', {
         method: 'POST',
         body: formData,
