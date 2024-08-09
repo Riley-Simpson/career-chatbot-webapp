@@ -21,6 +21,8 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
 )
+file_handler = logging.FileHandler('/home/RileySimpson/career-chatbot-webapp/')
+app.logger.addHandler(file_handler)
 logger = logging.getLogger(__name__)
 
 
