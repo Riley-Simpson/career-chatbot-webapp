@@ -30,12 +30,14 @@ class Chat:
         try:
             if not self.past_interactions:
                 self.past_interactions = "You are a Career Chatbot and you will answer the user's question using the following information only note this information was not submitted by the user but rather suplemental information from a R.A.G database."
-            
-            context = (f"\n History: {self.past_interactions} \nUser Query: {query_str}")
+                logger.info("Reset past interactions")
+                
+            context = (f"\n {self.past_interactions} \nUser Query: {query_str}")
             
             response = requests.post(self.local_api_url + "/chat", json={"context": context})
             response_data = response.json()
             self.past_interactions += f"\nHistory: {context} \nUser: {query_str} \nBot: {response_data.get('response')}"
+            logger.info(f"past interactions set to: \n{self.past_interactions}")            
             return response_data.get('response', 'No response content')
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
@@ -97,6 +99,7 @@ def chat():
         active_session['user'] = request.remote_addr
         active_session['expiry'] = datetime.now() + timedelta(minutes=10)
         active_session['chat_history'] = "" 
+        logger.info("New session started.")
     elif active_session['user'] != request.remote_addr:
         return jsonify({'response': 'Chat is currently in use by another user. Please wait your turn.'})
 
@@ -109,6 +112,8 @@ def chat():
     chat_instance.past_interactions = active_session['chat_history']
     response = chat_instance.query(user_input)
     active_session['chat_history'] = chat_instance.past_interactions
+
+    logger.info(f"Session history after update: {active_session['chat_history']}")
     return jsonify({"response": response})
 
 @app.route('/upload_resume', methods=['POST'])
