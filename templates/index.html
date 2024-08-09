@@ -28,12 +28,12 @@
             <div id="loading-spinner" class="spinner"></div>
         </div>
         <input type="text" id="query-input" placeholder="Type your query here..." style="display:none;">
-        <button onclick="sendQuery()" style="display:none;">Send</button>
+        <button id="send-button" onclick="sendQuery()" style="display:none;">Send</button>
 
         <!-- Resume Upload Section -->
         <div id="resume-upload" style="display:none;">
             <input type="file" id="resume-input" accept=".pdf">
-            <button onclick="uploadResume()">Upload Resume</button>
+            <button id="resume-upload" onclick="uploadResume()">Upload Resume</button>
         </div>
 
         <!-- Feedback Form Section-->
