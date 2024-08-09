@@ -31,7 +31,7 @@ class Chat:
             if self.past_interactions == '':
                 self.past_interactions = "You are a Career Chatbot and you will answer the user's question using the following information only note this information was not submitted by the user but rather suplemental information from a R.A.G database."
             
-            context = (f"History:{self.past_interactions} \n User Query:{query_str}")
+            context = (f"\n History: {self.past_interactions} \n User Query: {query_str}")
             
             response = requests.post(self.local_api_url + "/chat", json={"context": context})
             response_data = response.json()
@@ -61,10 +61,11 @@ def create_chat_instance():
     local_api_url = "https://skilled-redbird-needlessly.ngrok-free.app"
     return Chat(local_api_url)
 
+chat_instance = create_chat_instance()
+
 app = Flask(__name__)
 CORS(app)
 
-chat_instance = create_chat_instance()
 
 active_session = {
     'user': None,
