@@ -21,6 +21,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
 )
+
 file_handler = logging.FileHandler('/home/RileySimpson/career-chatbot-webapp/')
 app.logger.addHandler(file_handler)
 logger = logging.getLogger(__name__)
@@ -54,7 +55,7 @@ class Chat:
             response_data = response.json()
             session['chat_history'] += f"\nUser: {query_str}\nBot: {response_data.get('response')}"
             
-            logger.info(f"('------------------------------\nPast interactions set to: \n{session['chat_history']}")            
+            logger.info(f"------------------------------\nPast interactions set to: \n{session['chat_history']}")            
             
             return response_data.get('response', 'No response content')
         except Exception as e:
@@ -63,6 +64,10 @@ class Chat:
     
     def upload_resume(self,file):
         try:
+            if 'chat_history' not in session:
+                session['chat_history'] = "You are a Career Chatbot and you will answer the user's question using the following information only note this information was not submitted by the user but rather supplemental information from a R.A.G database."
+                logger.info("Reset past interactions")
+                
             pdf_reader = PdfReader(file)
             text =''
             for page_num in range(len(pdf_reader.pages)):
@@ -70,6 +75,9 @@ class Chat:
                 text += page.extract_text()
             response = requests.post(self.local_api_url + "/upload_resume", json={"resume":text})        
             response_data=response.json()
+            session['chat_history'] += f"\nUser: {text}\nBot: {response_data.get('response')}"
+            logger.info(f"('------------------------------\nPast interactions set to: \n{session['chat_history']}")
+            
             return response_data.get('response', 'No response content')
         except Exception as e:
             logger.error(f"Error communicating with local API: {e} \n")
@@ -93,7 +101,7 @@ def index():
      @return The response to the request as a string or HTML document depending on the type of response being returned. If the response is an HTML document it will be returned
     """
     session.pop('chat_history', None)
-    logger.info('------------------------------New Session------------------------------\n')
+    logger.info(f'------------------------------New Session------------------------------\n')
     return render_template("index.html")
 
 @app.route('/chat', methods=['POST'])
