@@ -58,7 +58,7 @@ def create_chat_instance():
 app = Flask(__name__)
 CORS(app)
 
-chat_instance = create_chat_instance()
+
 
 active_session = {
     'user': None,
@@ -84,7 +84,7 @@ def chat():
      @return JSON with response or error message if something went wrong. The user is logged in and a message is
     """
     global active_session
-
+    chat_instance = create_chat_instance()
     # If the chatbot is currently in use by another user.
     if not active_session['user'] or active_session['expiry'] < datetime.now():
         # Start new session
@@ -104,6 +104,7 @@ def chat():
 
 @app.route('/upload_resume', methods=['POST'])
 def upload_resume():
+    chat_instance = create_chat_instance()
     if 'resume' not in request.files:
         return jsonify({'success': False, 'message': f'No file part: {request.files}'})
     
