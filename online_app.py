@@ -92,6 +92,14 @@ def create_chat_instance():
 chat_instance = create_chat_instance()
 
 
+def check_availability():
+    if not active_session['user'] or active_session['expiry'] < datetime.now():
+        # Start new session
+        active_session['user'] = request.remote_addr
+        active_session['expiry'] = datetime.now() + timedelta(minutes=10)
+    elif active_session['user'] != request.remote_addr:
+        return jsonify({'response': 'Chat is currently in use by another user. Please wait your turn.'})
+
 @app.route("/")
 def index():
     """
@@ -114,12 +122,7 @@ def chat():
     """
     global active_session
     # If the chatbot is currently in use by another user.
-    if not active_session['user'] or active_session['expiry'] < datetime.now():
-        # Start new session
-        active_session['user'] = request.remote_addr
-        active_session['expiry'] = datetime.now() + timedelta(minutes=10)
-    elif active_session['user'] != request.remote_addr:
-        return jsonify({'response': 'Chat is currently in use by another user. Please wait your turn.'})
+    check_availability()
 
     data = request.get_json()
     user_input = data.get('context')
@@ -133,6 +136,7 @@ def chat():
 
 @app.route('/upload_resume', methods=['POST'])
 def upload_resume():
+    check_availability()
     if 'resume' not in request.files:
         return jsonify({'success': False, 'message': f'No file part: {request.files}'})
     
