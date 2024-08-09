@@ -18,7 +18,7 @@ class Chat:
          @param local_api_url - The URL of the API
         """
         self.local_api_url = local_api_url
-
+        self.past_interactions = ''
     def query(self, query_str):
         """
          Query the chat server with query_str and return the response. This is used for debugging and to check the status of the chat
@@ -28,13 +28,19 @@ class Chat:
          @return The response of the chat or Sorry if something went wrong. In this case you should try again
         """
         try:
-            response = requests.post(self.local_api_url + "/chat", json={"context": query_str})
+            if self.past_interactions == '':
+                self.past_interactions = "You are a Career Chatbot and you will answer the user's question using the following information only note this information was not submitted by the user but rather suplemental information from a R.A.G database."
+            
+            context = (f"History:{self.past_interactions} \n User Query:{query_str}")
+            
+            response = requests.post(self.local_api_url + "/chat", json={"context": context})
             response_data = response.json()
+            self.past_interactions = response_data.get('response')
             return response_data.get('response', 'No response content')
         except Exception as e:
             logger.error(f"Error communicating with local API: {e}")
             return "Sorry, something went wrong. Please try again."
-
+    
     def upload_resume(self,file):
         try:
             pdf_reader = PdfReader(file)
@@ -58,7 +64,7 @@ def create_chat_instance():
 app = Flask(__name__)
 CORS(app)
 
-
+chat_instance = create_chat_instance()
 
 active_session = {
     'user': None,
@@ -104,7 +110,6 @@ def chat():
 
 @app.route('/upload_resume', methods=['POST'])
 def upload_resume():
-    chat_instance = create_chat_instance()
     if 'resume' not in request.files:
         return jsonify({'success': False, 'message': f'No file part: {request.files}'})
     
